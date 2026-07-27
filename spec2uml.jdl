@@ -26,6 +26,7 @@ entity Requirement {
   sentId Integer required
   text TextBlob required
   source String required
+  projectId String required
   type String required
   specLevel String required
   
@@ -143,9 +144,10 @@ relationship OneToMany {
 relationship ManyToOne {
   Project{createdBy} to User
   
-  // OPTIMIZATION: Requirement references Project.
-  // Scalable for 50,000+ requirements per project.
-  Requirement{project required} to Project
+  // OPTIMIZATION: 
+  // 1. Requirement references Project (ManyToOne) to support 50,000+ items.
+  // 2. Uses '(name)' to map 'projectName' in DTO, preventing conflict with legacy 'projectId'.
+  Requirement{project(name) required} to Project
 }
 
 // --- Many-to-Many Relationships ---
