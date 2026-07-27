@@ -1,0 +1,260 @@
+/**
+ * Complete JHipster JDL for MongoDB
+ * UML Annotation & Requirements Management System
+ */
+
+// ==========================================
+// ENUMS
+// ==========================================
+
+enum Language {
+  EN, ES, FR, DE
+}
+
+enum Priority {
+  LOW, MEDIUM, HIGH, CRITICAL
+}
+
+enum RequirementType {
+  FUNCTIONAL, NON_FUNCTIONAL, CONSTRAINT, SYSTEM
+}
+
+enum RequirementStatus {
+  DRAFT, IN_REVIEW, APPROVED, REJECTED
+}
+
+enum DiagramType {
+  CLASS_DIAGRAM, SEQUENCE_DIAGRAM, USE_CASE_DIAGRAM, ACTIVITY_DIAGRAM, STATE_DIAGRAM
+}
+
+enum ReviewDecision {
+  APPROVED, NEEDS_CHANGES, REJECTED
+}
+
+enum AuditAction {
+  CREATE_PROJECT, UPDATE_PROJECT, CREATE_REQUIREMENT, UPDATE_REQUIREMENT,
+  CREATE_ANNOTATION, UPDATE_ANNOTATION, REVIEW_ANNOTATION, DELETE_RESOURCE
+}
+
+// ==========================================
+// 7.3 PROJECTS & EMBEDDED ENTITIES
+// ==========================================
+
+entity Project {
+  name String required
+  description TextBlob
+  language Language required
+  umlVersion String
+  createdAt Instant required
+  updatedAt Instant
+}
+
+entity ProjectStatistics {
+  requirements Integer min(0)
+  completed Integer min(0)
+  approved Integer min(0)
+}
+
+// ==========================================
+// 7.4 REQUIREMENTS & EMBEDDED ENTITIES
+// ==========================================
+
+entity Requirement {
+  // Basic Requirement Fields
+  sentId Integer required
+  text TextBlob required
+  source String required
+  project_id String required
+  type String required
+  spec_level String required
+  
+  // ==========================================
+  // STRUCTURAL DIAGRAMS (7 Types)
+  // ==========================================
+  
+  /** Serialized Class Diagram (classes, attributes, methods, and relationships) */
+  classDiagram TextBlob
+  classConcepts ClassConcepts
+  
+  /** Serialized Component Diagram (high-level software components and interfaces) */
+  componentDiagram TextBlob
+  
+  /** Serialized Composite Structure Diagram (internal structure of classifiers/parts) */
+  compositeStructureDiagram TextBlob
+  
+  /** Serialized Deployment Diagram (execution nodes and hardware/software mapping) */
+  deploymentDiagram TextBlob
+  
+  /** Serialized Object Diagram (instances of classes and runtime snapshots) */
+  objectDiagram TextBlob
+  
+  /** Serialized Package Diagram (organization and dependencies between packages) */
+  packageDiagram TextBlob
+  
+  /** Serialized Profile Diagram (custom stereotypes, tagged values, and constraints) */
+  profileDiagram TextBlob
+
+  // ==========================================
+  // BEHAVIORAL & INTERACTION DIAGRAMS (7 Types)
+  // ==========================================
+  
+  /** Serialized Activity Diagram (workflows, step sequences, and business processes) */
+  activityDiagram TextBlob
+  
+  /** Serialized Use Case Diagram (actors, system boundaries, and goal interactions) */
+  useCaseDiagram TextBlob
+  useCaseConcepts UseCaseConcepts
+  
+  /** Serialized State Machine Diagram (states, transitions, and event triggers) */
+  stateDiagram TextBlob
+  
+  /** Serialized Sequence Diagram (chronological message exchanges between lifelines) */
+  sequenceDiagram TextBlob
+  
+  /** Serialized Communication Diagram (object relationships focusing on message paths) */
+  communicationDiagram TextBlob
+  
+  /** Serialized Interaction Overview Diagram (high-level control flow combining interactions) */
+  interactionOverviewDiagram TextBlob
+
+  // Status and Timestamps
+
+  status RequirementStatus required
+  createdAt Instant required
+  updatedAt Instant
+}
+
+entity RequirementSource {
+  fileName String
+  page Integer min(1)
+  section String
+}
+
+entity RequirementMetadata {
+  priority Priority
+  type RequirementType
+  language String
+}
+
+// ==========================================
+// 7.5 ANNOTATIONS & EMBEDDED ENTITIES
+// ==========================================
+
+entity Annotation {
+  diagramType DiagramType required
+  umlLanguage String
+  umlText TextBlob
+  renderedImage String
+  version Integer min(1)
+  status RequirementStatus
+  reviewDecision ReviewDecision
+  createdAt Instant required
+  updatedAt Instant
+}
+
+entity ReviewComment {
+  text String required
+  createdAt Instant required
+}
+
+// ==========================================
+// 7.6 ANNOTATION VERSIONS
+// ==========================================
+
+entity AnnotationVersion {
+  version Integer required min(1)
+  umlText TextBlob required
+  changeSummary String
+  createdAt Instant required
+}
+
+// ==========================================
+// 7.7 REVIEWS & EMBEDDED ENTITIES
+// ==========================================
+
+entity Review {
+  decision ReviewDecision required
+  createdAt Instant required
+}
+
+entity LineComment {
+  line Integer min(1)
+  text String required
+  resolved Boolean required
+}
+
+// ==========================================
+// 7.8 GUIDELINES
+// ==========================================
+
+entity Guideline {
+  title String required
+  content TextBlob required
+  version Integer min(1)
+  createdAt Instant required
+}
+
+// ==========================================
+// 7.9 ACTIVITY LOGS & EMBEDDED ENTITIES
+// ==========================================
+
+entity ActivityLog {
+  action AuditAction required
+  resourceId String required
+  resourceType String required
+  timestamp Instant required
+}
+
+entity ActivityDetails {
+  diagramType DiagramType
+  extraDetails String
+}
+
+// ==========================================
+// RELATIONSHIPS
+// ==========================================
+
+// --- One-to-One Relationships (Embedded Objects) ---
+relationship OneToOne {
+  Project{statistics} to ProjectStatistics,
+  Requirement{source} to RequirementSource,
+  Requirement{metadata} to RequirementMetadata,
+  ActivityLog{details} to ActivityDetails
+}
+
+// --- One-to-Many Relationships (Arrays of Objects & Collections) ---
+relationship OneToMany {
+  Project{requirements} to Requirement{project},
+  Project{guidelines} to Guideline{project},
+  Requirement{annotations} to Annotation{requirement},
+  Annotation{versions} to AnnotationVersion{annotation},
+  Annotation{reviews} to Review{annotation},
+  Annotation{reviewComments} to ReviewComment,
+  Review{comments} to LineComment
+}
+
+// --- User Relationships (Many-to-One & Many-to-Many) ---
+relationship ManyToOne {
+  Project{annotationGuideline} to Guideline,
+  Project{createdBy} to User
+  Requirement{assignedTo} to User
+  Annotation{annotator} to User
+  Annotation{reviewer} to User
+  AnnotationVersion{author} to User
+  Review{reviewer} to User
+  ReviewComment{author} to User
+  ActivityLog{user} to User
+}
+
+relationship ManyToMany {
+  Project{annotators} to User{annotatedProjects}
+  Project{reviewers} to User{reviewedProjects}
+}
+
+// ==========================================
+// CONFIGURATION OPTIONS
+// ==========================================
+
+dto * with mapstruct
+service * with serviceClass
+paginate Project, Requirement, Annotation, ActivityLog with pagination
