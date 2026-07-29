@@ -1,0 +1,25 @@
+{
+  "spec2UmlApp": {
+    "requirementClassConcepts": {
+      "home": {
+        "title": "Requirement Class Concepts",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Requirement Class Concepts",
+        "createOrEditLabel": "Create or edit a Requirement Class Concepts",
+        "notFound": "No Requirement Class Concepts found"
+      },
+      "created": "A new Requirement Class Concepts is created with identifier {{ param }}",
+      "updated": "A Requirement Class Concepts is updated with identifier {{ param }}",
+      "deleted": "A Requirement Class Concepts is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Requirement Class Concepts {{ id }}?"
+      },
+      "detail": {
+        "title": "Requirement Class Concepts"
+      },
+      "id": "ID",
+      "classes": "Classes",
+      "relationships": "Relationships"
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "spec2UmlApp": {
+    "classConcept": {
+      "home": {
+        "title": "Class Concepts",
+        "refreshListLabel": "Refrescar lista",
+        "createLabel": "Crear nuevo Class Concept",
+        "createOrEditLabel": "Crear o editar Class Concept",
+        "notFound": "Ningún Class Concepts encontrado"
+      },
+      "created": "Un nuevo Class Concept ha sido creado con el identificador {{ param }}",
+      "updated": "Un Class Concept ha sido actualizado con el identificador {{ param }}",
+      "deleted": "Un Class Concept ha sido eliminado con el identificador {{ param }}",
+      "delete": {
+        "question": "¿Seguro que quiere eliminar Class Concept {{ id }}?"
+      },
+      "detail": {
+        "title": "Class Concept"
+      },
+      "id": "ID",
+      "name": "Name",
+      "stereotype": "Stereotype",
+      "attributes": "Attributes",
+      "operations": "Operations",
+      "requirementClassConcepts": "Requirement Class Concepts"
+    }
+  }
+}

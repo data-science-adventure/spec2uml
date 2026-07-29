@@ -1,0 +1,26 @@
+{
+  "spec2UmlApp": {
+    "requirementUseCaseConcepts": {
+      "home": {
+        "title": "Requirement Use Case Concepts",
+        "refreshListLabel": "Refrescar lista",
+        "createLabel": "Crear nuevo Requirement Use Case Concepts",
+        "createOrEditLabel": "Crear o editar Requirement Use Case Concepts",
+        "notFound": "Ningún Requirement Use Case Concepts encontrado"
+      },
+      "created": "Un nuevo Requirement Use Case Concepts ha sido creado con el identificador {{ param }}",
+      "updated": "Un Requirement Use Case Concepts ha sido actualizado con el identificador {{ param }}",
+      "deleted": "Un Requirement Use Case Concepts ha sido eliminado con el identificador {{ param }}",
+      "delete": {
+        "question": "¿Seguro que quiere eliminar Requirement Use Case Concepts {{ id }}?"
+      },
+      "detail": {
+        "title": "Requirement Use Case Concepts"
+      },
+      "id": "ID",
+      "actors": "Actors",
+      "useCases": "Use Cases",
+      "relationships": "Relationships"
+    }
+  }
+}

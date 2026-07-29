@@ -1,0 +1,27 @@
+{
+  "spec2UmlApp": {
+    "classOperation": {
+      "home": {
+        "title": "Class Operations",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Class Operation",
+        "createOrEditLabel": "Create or edit a Class Operation",
+        "notFound": "No Class Operations found"
+      },
+      "created": "A new Class Operation is created with identifier {{ param }}",
+      "updated": "A Class Operation is updated with identifier {{ param }}",
+      "deleted": "A Class Operation is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Class Operation {{ id }}?"
+      },
+      "detail": {
+        "title": "Class Operation"
+      },
+      "id": "ID",
+      "name": "Name",
+      "returnType": "Return Type",
+      "parameters": "Parameters",
+      "classConcept": "Class Concept"
+    }
+  }
+}

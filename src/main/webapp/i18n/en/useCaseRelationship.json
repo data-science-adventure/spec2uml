@@ -1,0 +1,28 @@
+{
+  "spec2UmlApp": {
+    "useCaseRelationship": {
+      "home": {
+        "title": "Use Case Relationships",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Use Case Relationship",
+        "createOrEditLabel": "Create or edit a Use Case Relationship",
+        "notFound": "No Use Case Relationships found"
+      },
+      "created": "A new Use Case Relationship is created with identifier {{ param }}",
+      "updated": "A Use Case Relationship is updated with identifier {{ param }}",
+      "deleted": "A Use Case Relationship is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Use Case Relationship {{ id }}?"
+      },
+      "detail": {
+        "title": "Use Case Relationship"
+      },
+      "id": "ID",
+      "source": "Source",
+      "target": "Target",
+      "type": "Type",
+      "label": "Label",
+      "requirementUseCaseConcepts": "Requirement Use Case Concepts"
+    }
+  }
+}

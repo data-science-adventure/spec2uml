@@ -1,0 +1,30 @@
+{
+  "spec2UmlApp": {
+    "classRelationship": {
+      "home": {
+        "title": "Class Relationships",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Class Relationship",
+        "createOrEditLabel": "Create or edit a Class Relationship",
+        "notFound": "No Class Relationships found"
+      },
+      "created": "A new Class Relationship is created with identifier {{ param }}",
+      "updated": "A Class Relationship is updated with identifier {{ param }}",
+      "deleted": "A Class Relationship is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Class Relationship {{ id }}?"
+      },
+      "detail": {
+        "title": "Class Relationship"
+      },
+      "id": "ID",
+      "source": "Source",
+      "target": "Target",
+      "type": "Type",
+      "sourceMultiplicity": "Source Multiplicity",
+      "targetMultiplicity": "Target Multiplicity",
+      "label": "Label",
+      "requirementClassConcepts": "Requirement Class Concepts"
+    }
+  }
+}

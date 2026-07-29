@@ -1,0 +1,26 @@
+{
+  "spec2UmlApp": {
+    "useCaseCondition": {
+      "home": {
+        "title": "Use Case Conditions",
+        "refreshListLabel": "Refrescar lista",
+        "createLabel": "Crear nuevo Use Case Condition",
+        "createOrEditLabel": "Crear o editar Use Case Condition",
+        "notFound": "Ningún Use Case Conditions encontrado"
+      },
+      "created": "Un nuevo Use Case Condition ha sido creado con el identificador {{ param }}",
+      "updated": "Un Use Case Condition ha sido actualizado con el identificador {{ param }}",
+      "deleted": "Un Use Case Condition ha sido eliminado con el identificador {{ param }}",
+      "delete": {
+        "question": "¿Seguro que quiere eliminar Use Case Condition {{ id }}?"
+      },
+      "detail": {
+        "title": "Use Case Condition"
+      },
+      "id": "ID",
+      "conditionText": "Condition Text",
+      "preconditionUseCaseConcept": "Precondition Use Case Concept",
+      "postconditionUseCaseConcept": "Postcondition Use Case Concept"
+    }
+  }
+}

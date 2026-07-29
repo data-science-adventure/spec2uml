@@ -1,0 +1,38 @@
+{
+  "spec2UmlApp": {
+    "requirement": {
+      "home": {
+        "title": "Requirements",
+        "refreshListLabel": "Refrescar lista",
+        "createLabel": "Crear nuevo Requirement",
+        "createOrEditLabel": "Crear o editar Requirement",
+        "notFound": "Ningún Requirements encontrado"
+      },
+      "created": "Un nuevo Requirement ha sido creado con el identificador {{ param }}",
+      "updated": "Un Requirement ha sido actualizado con el identificador {{ param }}",
+      "deleted": "Un Requirement ha sido eliminado con el identificador {{ param }}",
+      "delete": {
+        "question": "¿Seguro que quiere eliminar Requirement {{ id }}?"
+      },
+      "detail": {
+        "title": "Requirement"
+      },
+      "id": "ID",
+      "sentId": "Sent Id",
+      "text": "Text",
+      "source": "Source",
+      "projectId": "Project Id",
+      "type": "Type",
+      "specLevel": "Spec Level",
+      "classDiagram": "Class Diagram",
+      "useCaseDiagram": "Use Case Diagram",
+      "status": "Status",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "useCaseConcepts": "Use Case Concepts",
+      "classConcepts": "Class Concepts",
+      "project": "Project",
+      "annotators": "Annotators"
+    }
+  }
+}

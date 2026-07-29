@@ -1,0 +1,25 @@
+{
+  "spec2UmlApp": {
+    "useCaseBusinessRule": {
+      "home": {
+        "title": "Use Case Business Rules",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Use Case Business Rule",
+        "createOrEditLabel": "Create or edit a Use Case Business Rule",
+        "notFound": "No Use Case Business Rules found"
+      },
+      "created": "A new Use Case Business Rule is created with identifier {{ param }}",
+      "updated": "A Use Case Business Rule is updated with identifier {{ param }}",
+      "deleted": "A Use Case Business Rule is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Use Case Business Rule {{ id }}?"
+      },
+      "detail": {
+        "title": "Use Case Business Rule"
+      },
+      "id": "ID",
+      "ruleText": "Rule Text",
+      "useCaseConcept": "Use Case Concept"
+    }
+  }
+}

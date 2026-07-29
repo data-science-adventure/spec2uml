@@ -1,0 +1,35 @@
+{
+  "annotations": {
+    "changelogDate": "20260729192513"
+  },
+  "applications": ["*"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "stereotype",
+      "fieldType": "String"
+    }
+  ],
+  "name": "ClassConcept",
+  "relationships": [
+    {
+      "otherEntityName": "classAttribute",
+      "relationshipName": "attributes",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "classOperation",
+      "relationshipName": "operations",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

@@ -1,0 +1,40 @@
+{
+  "annotations": {
+    "changelogDate": "20260729192517"
+  },
+  "applications": ["*"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "source",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "target",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "type",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "sourceMultiplicity",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "targetMultiplicity",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "label",
+      "fieldType": "String"
+    }
+  ],
+  "name": "ClassRelationship",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

@@ -1,0 +1,26 @@
+{
+  "spec2UmlApp": {
+    "projectStatistics": {
+      "home": {
+        "title": "Project Statistics",
+        "refreshListLabel": "Refrescar lista",
+        "createLabel": "Crear nuevo Project Statistics",
+        "createOrEditLabel": "Crear o editar Project Statistics",
+        "notFound": "Ningún Project Statistics encontrado"
+      },
+      "created": "Un nuevo Project Statistics ha sido creado con el identificador {{ param }}",
+      "updated": "Un Project Statistics ha sido actualizado con el identificador {{ param }}",
+      "deleted": "Un Project Statistics ha sido eliminado con el identificador {{ param }}",
+      "delete": {
+        "question": "¿Seguro que quiere eliminar Project Statistics {{ id }}?"
+      },
+      "detail": {
+        "title": "Project Statistics"
+      },
+      "id": "ID",
+      "requirements": "Requirements",
+      "completed": "Completed",
+      "approved": "Approved"
+    }
+  }
+}

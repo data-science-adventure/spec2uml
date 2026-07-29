@@ -1,3 +1,7 @@
+// ==========================================
+// ENUMS
+// ==========================================
+
 enum Language {
   EN, ES, FR, DE
 }
@@ -5,6 +9,10 @@ enum Language {
 enum RequirementStatus {
   DRAFT, IN_REVIEW, APPROVED, REJECTED
 }
+
+// ==========================================
+// ENTITIES
+// ==========================================
 
 entity Project {
   name String required
@@ -26,7 +34,10 @@ entity Requirement {
   sentId Integer required
   text TextBlob required
   source String required
+  
+  // Legacy field preserved for legacy database mapping
   projectId String required
+  
   type String required
   specLevel String required
   
@@ -40,70 +51,70 @@ entity Requirement {
 }
 
 entity RequirementUseCaseConcepts {
-    // Parent holder for use case extraction
+  // Parent holder for use case extraction
 }
 
 entity UseCaseActor {
-    name String required
-    description TextBlob
+  name String required
+  description TextBlob
 }
 
 entity UseCaseConcept {
-    name String required
-    description TextBlob
-    trigger String
-    systemBoundary String
+  name String required
+  description TextBlob
+  trigger String
+  systemBoundary String
 }
 
 entity UseCaseActorRef {
-    actorName String required
+  actorName String required
 }
 
 entity UseCaseCondition {
-    conditionText String
+  conditionText String
 }
 
 entity UseCaseBusinessRule {
-    ruleText String
+  ruleText String
 }
 
 entity UseCaseRelationship {
-    source String required
-    target String required
-    type String required
-    label String
+  source String required
+  target String required
+  type String required
+  label String
 }
 
 entity RequirementClassConcepts {
 }
 
 entity ClassConcept {
-    name String required
-    stereotype String
+  name String required
+  stereotype String
 }
 
 entity ClassAttribute {
-    name String required
-    type String required
-    visibility String // public, private, protected
+  name String required
+  type String required
+  visibility String // public, private, protected
 }
 
 entity ClassOperation {
-    name String
-    returnType String
+  name String
+  returnType String
 }
 
 entity OperationParameter {
-    paramName String
+  paramName String
 }
 
 entity ClassRelationship {
-    source String required
-    target String required
-    type String required // Association, Aggregation, Composition, Inheritance
-    sourceMultiplicity String
-    targetMultiplicity String
-    label String
+  source String required
+  target String required
+  type String required // Association, Aggregation, Composition, Inheritance
+  sourceMultiplicity String
+  targetMultiplicity String
+  label String
 }
 
 // ==========================================
@@ -117,19 +128,21 @@ relationship OneToOne {
   Requirement{classConcepts} to RequirementClassConcepts
 }
 
-// --- One-to-Many Relationships (Arrays of Objects & Collections) ---
+// --- One-to-Many Relationships ---
 relationship OneToMany {
-  // OPTIMIZATION: Removed Project{requirements} from here.
-  // Project no longer maintains an array of Requirement references.
-
   // Use Case Concepts Structure
   RequirementUseCaseConcepts{actors} to UseCaseActor
   RequirementUseCaseConcepts{useCases} to UseCaseConcept
   RequirementUseCaseConcepts{relationships} to UseCaseRelationship
-  UseCaseConcept{primaryActors} to UseCaseActorRef
-  UseCaseConcept{secondaryActors} to UseCaseActorRef
-  UseCaseConcept{preconditions} to UseCaseCondition
-  UseCaseConcept{postconditions} to UseCaseCondition
+  
+  // FIXED: Explicit back-references to prevent property collisions on UseCaseActorRef
+  UseCaseConcept{primaryActors} to UseCaseActorRef{primaryUseCaseConcept}
+  UseCaseConcept{secondaryActors} to UseCaseActorRef{secondaryUseCaseConcept}
+  
+  // FIXED: Explicit back-references to prevent property collisions on UseCaseCondition
+  UseCaseConcept{preconditions} to UseCaseCondition{preconditionUseCaseConcept}
+  UseCaseConcept{postconditions} to UseCaseCondition{postconditionUseCaseConcept}
+  
   UseCaseConcept{businessRules} to UseCaseBusinessRule
 
   // Class Concepts Structure
@@ -142,19 +155,18 @@ relationship OneToMany {
 
 // --- Many-to-One Relationships ---
 relationship ManyToOne {
-  Project{createdBy} to User
+  Project{createdBy} to User with builtInEntity
   
-  // OPTIMIZATION: 
-  // 1. Requirement references Project (ManyToOne) to support 50,000+ items.
-  // 2. Uses '(name)' to map 'projectName' in DTO, preventing conflict with legacy 'projectId'.
+  // Scalable project reference mapped to projectName in DTO
   Requirement{project(name) required} to Project
 }
 
 // --- Many-to-Many Relationships ---
 relationship ManyToMany {
-  Requirement{annotators} to User{annotatedRequirement}
-  Project{annotators} to User{annotatedProjects}
-  Project{reviewers} to User{reviewedProjects}
+  // FIXED: Explicit unidirectional ManyToMany to builtInEntity User
+  Requirement{annotators} to User with builtInEntity
+  Project{annotators} to User with builtInEntity
+  Project{reviewers} to User with builtInEntity
 }
 
 // ==========================================
@@ -163,4 +175,5 @@ relationship ManyToMany {
 
 dto * with mapstruct
 service * with serviceClass
+
 paginate Project, Requirement with pagination

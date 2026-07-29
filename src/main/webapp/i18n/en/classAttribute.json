@@ -1,0 +1,27 @@
+{
+  "spec2UmlApp": {
+    "classAttribute": {
+      "home": {
+        "title": "Class Attributes",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Class Attribute",
+        "createOrEditLabel": "Create or edit a Class Attribute",
+        "notFound": "No Class Attributes found"
+      },
+      "created": "A new Class Attribute is created with identifier {{ param }}",
+      "updated": "A Class Attribute is updated with identifier {{ param }}",
+      "deleted": "A Class Attribute is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Class Attribute {{ id }}?"
+      },
+      "detail": {
+        "title": "Class Attribute"
+      },
+      "id": "ID",
+      "name": "Name",
+      "type": "Type",
+      "visibility": "Visibility",
+      "classConcept": "Class Concept"
+    }
+  }
+}

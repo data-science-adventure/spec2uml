@@ -1,0 +1,25 @@
+{
+  "spec2UmlApp": {
+    "operationParameter": {
+      "home": {
+        "title": "Operation Parameters",
+        "refreshListLabel": "Refrescar lista",
+        "createLabel": "Crear nuevo Operation Parameter",
+        "createOrEditLabel": "Crear o editar Operation Parameter",
+        "notFound": "Ningún Operation Parameters encontrado"
+      },
+      "created": "Un nuevo Operation Parameter ha sido creado con el identificador {{ param }}",
+      "updated": "Un Operation Parameter ha sido actualizado con el identificador {{ param }}",
+      "deleted": "Un Operation Parameter ha sido eliminado con el identificador {{ param }}",
+      "delete": {
+        "question": "¿Seguro que quiere eliminar Operation Parameter {{ id }}?"
+      },
+      "detail": {
+        "title": "Operation Parameter"
+      },
+      "id": "ID",
+      "paramName": "Param Name",
+      "classOperation": "Class Operation"
+    }
+  }
+}

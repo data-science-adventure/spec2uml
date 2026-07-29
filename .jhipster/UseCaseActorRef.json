@@ -1,0 +1,33 @@
+{
+  "annotations": {
+    "changelogDate": "20260729192508"
+  },
+  "applications": ["*"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "actorName",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "name": "UseCaseActorRef",
+  "relationships": [
+    {
+      "otherEntityName": "useCaseConcept",
+      "otherEntityRelationshipName": "primaryActors",
+      "relationshipName": "primaryUseCaseConcept",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "useCaseConcept",
+      "otherEntityRelationshipName": "secondaryActors",
+      "relationshipName": "secondaryUseCaseConcept",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

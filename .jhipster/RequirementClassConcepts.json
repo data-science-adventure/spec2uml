@@ -1,0 +1,25 @@
+{
+  "annotations": {
+    "changelogDate": "20260729192512"
+  },
+  "applications": ["*"],
+  "dto": "mapstruct",
+  "fields": [],
+  "name": "RequirementClassConcepts",
+  "relationships": [
+    {
+      "otherEntityName": "classConcept",
+      "relationshipName": "classes",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "classRelationship",
+      "relationshipName": "relationships",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

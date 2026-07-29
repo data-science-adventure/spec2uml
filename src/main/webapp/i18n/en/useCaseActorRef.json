@@ -1,0 +1,26 @@
+{
+  "spec2UmlApp": {
+    "useCaseActorRef": {
+      "home": {
+        "title": "Use Case Actor Refs",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Use Case Actor Ref",
+        "createOrEditLabel": "Create or edit a Use Case Actor Ref",
+        "notFound": "No Use Case Actor Refs found"
+      },
+      "created": "A new Use Case Actor Ref is created with identifier {{ param }}",
+      "updated": "A Use Case Actor Ref is updated with identifier {{ param }}",
+      "deleted": "A Use Case Actor Ref is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Use Case Actor Ref {{ id }}?"
+      },
+      "detail": {
+        "title": "Use Case Actor Ref"
+      },
+      "id": "ID",
+      "actorName": "Actor Name",
+      "primaryUseCaseConcept": "Primary Use Case Concept",
+      "secondaryUseCaseConcept": "Secondary Use Case Concept"
+    }
+  }
+}

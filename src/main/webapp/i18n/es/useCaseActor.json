@@ -1,0 +1,26 @@
+{
+  "spec2UmlApp": {
+    "useCaseActor": {
+      "home": {
+        "title": "Use Case Actors",
+        "refreshListLabel": "Refrescar lista",
+        "createLabel": "Crear nuevo Use Case Actor",
+        "createOrEditLabel": "Crear o editar Use Case Actor",
+        "notFound": "Ningún Use Case Actors encontrado"
+      },
+      "created": "Un nuevo Use Case Actor ha sido creado con el identificador {{ param }}",
+      "updated": "Un Use Case Actor ha sido actualizado con el identificador {{ param }}",
+      "deleted": "Un Use Case Actor ha sido eliminado con el identificador {{ param }}",
+      "delete": {
+        "question": "¿Seguro que quiere eliminar Use Case Actor {{ id }}?"
+      },
+      "detail": {
+        "title": "Use Case Actor"
+      },
+      "id": "ID",
+      "name": "Name",
+      "description": "Description",
+      "requirementUseCaseConcepts": "Requirement Use Case Concepts"
+    }
+  }
+}

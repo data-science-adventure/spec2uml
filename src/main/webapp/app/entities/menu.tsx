@@ -1,12 +1,19 @@
 import React from 'react';
-import { Translate } from 'react-jhipster'; // eslint-disable-line
+import { Translate } from 'react-jhipster';
 
-import MenuItem from 'app/shared/layout/menus/menu-item'; // eslint-disable-line
+import MenuItem from 'app/shared/layout/menus/menu-item';
 
 const EntitiesMenu = () => {
   return (
     <>
       {/* prettier-ignore */}
+      <MenuItem icon="asterisk" to="/project">
+        <Translate contentKey="global.menu.entities.project" />
+      </MenuItem>
+
+      <MenuItem icon="asterisk" to="/requirement">
+        <Translate contentKey="global.menu.entities.requirement" />
+      </MenuItem>
       {/* jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here */}
     </>
   );

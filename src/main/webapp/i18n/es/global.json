@@ -7,7 +7,23 @@
       "jhipster-needle-menu-add-element": "JHipster will add additional menu entries here (do not translate!)",
       "entities": {
         "main": "Entidades",
-        "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
+        "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)",
+        "project": "Project",
+        "projectStatistics": "Project Statistics",
+        "requirement": "Requirement",
+        "requirementUseCaseConcepts": "Requirement Use Case Concepts",
+        "useCaseActor": "Use Case Actor",
+        "useCaseConcept": "Use Case Concept",
+        "useCaseActorRef": "Use Case Actor Ref",
+        "useCaseCondition": "Use Case Condition",
+        "useCaseBusinessRule": "Use Case Business Rule",
+        "useCaseRelationship": "Use Case Relationship",
+        "requirementClassConcepts": "Requirement Class Concepts",
+        "classConcept": "Class Concept",
+        "classAttribute": "Class Attribute",
+        "classOperation": "Class Operation",
+        "operationParameter": "Operation Parameter",
+        "classRelationship": "Class Relationship"
       },
       "account": {
         "main": "Cuenta",

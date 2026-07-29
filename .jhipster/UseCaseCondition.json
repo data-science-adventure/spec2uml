@@ -1,0 +1,32 @@
+{
+  "annotations": {
+    "changelogDate": "20260729192509"
+  },
+  "applications": ["*"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "conditionText",
+      "fieldType": "String"
+    }
+  ],
+  "name": "UseCaseCondition",
+  "relationships": [
+    {
+      "otherEntityName": "useCaseConcept",
+      "otherEntityRelationshipName": "preconditions",
+      "relationshipName": "preconditionUseCaseConcept",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "useCaseConcept",
+      "otherEntityRelationshipName": "postconditions",
+      "relationshipName": "postconditionUseCaseConcept",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

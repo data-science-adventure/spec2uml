@@ -1,0 +1,28 @@
+{
+  "annotations": {
+    "changelogDate": "20260729192515"
+  },
+  "applications": ["*"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "returnType",
+      "fieldType": "String"
+    }
+  ],
+  "name": "ClassOperation",
+  "relationships": [
+    {
+      "otherEntityName": "operationParameter",
+      "relationshipName": "parameters",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

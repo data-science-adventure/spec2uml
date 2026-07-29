@@ -1,0 +1,65 @@
+{
+  "annotations": {
+    "changelogDate": "20260729192507"
+  },
+  "applications": ["*"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "trigger",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "systemBoundary",
+      "fieldType": "String"
+    }
+  ],
+  "name": "UseCaseConcept",
+  "relationships": [
+    {
+      "otherEntityName": "useCaseActorRef",
+      "otherEntityRelationshipName": "primaryUseCaseConcept",
+      "relationshipName": "primaryActors",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "useCaseActorRef",
+      "otherEntityRelationshipName": "secondaryUseCaseConcept",
+      "relationshipName": "secondaryActors",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "useCaseCondition",
+      "otherEntityRelationshipName": "preconditionUseCaseConcept",
+      "relationshipName": "preconditions",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "useCaseCondition",
+      "otherEntityRelationshipName": "postconditionUseCaseConcept",
+      "relationshipName": "postconditions",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "useCaseBusinessRule",
+      "relationshipName": "businessRules",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

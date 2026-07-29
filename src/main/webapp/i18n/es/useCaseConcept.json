@@ -1,0 +1,33 @@
+{
+  "spec2UmlApp": {
+    "useCaseConcept": {
+      "home": {
+        "title": "Use Case Concepts",
+        "refreshListLabel": "Refrescar lista",
+        "createLabel": "Crear nuevo Use Case Concept",
+        "createOrEditLabel": "Crear o editar Use Case Concept",
+        "notFound": "Ningún Use Case Concepts encontrado"
+      },
+      "created": "Un nuevo Use Case Concept ha sido creado con el identificador {{ param }}",
+      "updated": "Un Use Case Concept ha sido actualizado con el identificador {{ param }}",
+      "deleted": "Un Use Case Concept ha sido eliminado con el identificador {{ param }}",
+      "delete": {
+        "question": "¿Seguro que quiere eliminar Use Case Concept {{ id }}?"
+      },
+      "detail": {
+        "title": "Use Case Concept"
+      },
+      "id": "ID",
+      "name": "Name",
+      "description": "Description",
+      "trigger": "Trigger",
+      "systemBoundary": "System Boundary",
+      "primaryActors": "Primary Actors",
+      "secondaryActors": "Secondary Actors",
+      "preconditions": "Preconditions",
+      "postconditions": "Postconditions",
+      "businessRules": "Business Rules",
+      "requirementUseCaseConcepts": "Requirement Use Case Concepts"
+    }
+  }
+}

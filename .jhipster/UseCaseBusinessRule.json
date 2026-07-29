@@ -1,0 +1,17 @@
+{
+  "annotations": {
+    "changelogDate": "20260729192510"
+  },
+  "applications": ["*"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "ruleText",
+      "fieldType": "String"
+    }
+  ],
+  "name": "UseCaseBusinessRule",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}
