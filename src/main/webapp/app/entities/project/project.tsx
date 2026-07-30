@@ -20,12 +20,13 @@ export const Project = () => {
   const navigate = useNavigate();
 
   const [paginationState, setPaginationState] = useState(
-    overridePaginationStateWithQueryParams(getPaginationState(pageLocation, ITEMS_PER_PAGE, 'id'), pageLocation.search),
+    overridePaginationStateWithQueryParams(getPaginationState(pageLocation, ITEMS_PER_PAGE, 'name'), pageLocation.search),
   );
 
   const projectList = useAppSelector(state => state.project.entities);
   const loading = useAppSelector(state => state.project.loading);
   const totalItems = useAppSelector(state => state.project.totalItems);
+  const account = useAppSelector(state => state.authentication.account);
 
   const getAllEntities = () => {
     dispatch(
@@ -91,6 +92,13 @@ export const Project = () => {
     return order === ASC ? faSortUp : faSortDown;
   };
 
+  // Helper check to determine if current logged-in user is the project owner
+  const isOwner = (project: any) => {
+    if (!account || !project?.createdBy) return false;
+    const creatorLogin = project.createdBy.login || project.createdBy.id;
+    return creatorLogin === account.login;
+  };
+
   return (
     <div>
       <h2 id="project-heading" data-cy="ProjectHeading">
@@ -112,9 +120,6 @@ export const Project = () => {
           <Table responsive>
             <thead>
               <tr>
-                <th className="hand" onClick={sort('id')}>
-                  <Translate contentKey="spec2UmlApp.project.id">ID</Translate> <FontAwesomeIcon icon={getSortIconByFieldName('id')} />
-                </th>
                 <th className="hand" onClick={sort('name')}>
                   <Translate contentKey="spec2UmlApp.project.name">Name</Translate>{' '}
                   <FontAwesomeIcon icon={getSortIconByFieldName('name')} />
@@ -122,18 +127,6 @@ export const Project = () => {
                 <th className="hand" onClick={sort('description')}>
                   <Translate contentKey="spec2UmlApp.project.description">Description</Translate>{' '}
                   <FontAwesomeIcon icon={getSortIconByFieldName('description')} />
-                </th>
-                <th className="hand" onClick={sort('language')}>
-                  <Translate contentKey="spec2UmlApp.project.language">Language</Translate>{' '}
-                  <FontAwesomeIcon icon={getSortIconByFieldName('language')} />
-                </th>
-                <th className="hand" onClick={sort('umlVersion')}>
-                  <Translate contentKey="spec2UmlApp.project.umlVersion">Uml Version</Translate>{' '}
-                  <FontAwesomeIcon icon={getSortIconByFieldName('umlVersion')} />
-                </th>
-                <th className="hand" onClick={sort('createdAt')}>
-                  <Translate contentKey="spec2UmlApp.project.createdAt">Created At</Translate>{' '}
-                  <FontAwesomeIcon icon={getSortIconByFieldName('createdAt')} />
                 </th>
                 <th className="hand" onClick={sort('updatedAt')}>
                   <Translate contentKey="spec2UmlApp.project.updatedAt">Updated At</Translate>{' '}
@@ -148,18 +141,8 @@ export const Project = () => {
             <tbody>
               {projectList.map(project => (
                 <tr key={`entity-${project.id}`} data-cy="entityTable">
-                  <td>
-                    <Button as={Link as any} to={`/project/${project.id}`} variant="link" size="sm">
-                      {project.id}
-                    </Button>
-                  </td>
                   <td>{project.name}</td>
                   <td>{project.description}</td>
-                  <td>
-                    <Translate contentKey={`spec2UmlApp.Language.${project.language}`} />
-                  </td>
-                  <td>{project.umlVersion}</td>
-                  <td>{project.createdAt ? <TextFormat type="date" value={project.createdAt} format={APP_DATE_FORMAT} /> : null}</td>
                   <td>{project.updatedAt ? <TextFormat type="date" value={project.updatedAt} format={APP_DATE_FORMAT} /> : null}</td>
                   <td>{project.createdBy ? project.createdBy.login || project.createdBy.id : ''}</td>
                   <td className="text-end">
@@ -170,31 +153,20 @@ export const Project = () => {
                           <Translate contentKey="entity.action.view">View</Translate>
                         </span>
                       </Button>
-                      <Button
-                        as={Link as any}
-                        to={`/project/${project.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
-                        variant="primary"
-                        size="sm"
-                        data-cy="entityEditButton"
-                      >
-                        <FontAwesomeIcon icon="pencil-alt" />{' '}
-                        <span className="d-none d-md-inline">
-                          <Translate contentKey="entity.action.edit">Edit</Translate>
-                        </span>
-                      </Button>
-                      <Button
-                        onClick={() =>
-                          (globalThis.location.href = `/project/${project.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`)
-                        }
-                        variant="danger"
-                        size="sm"
-                        data-cy="entityDeleteButton"
-                      >
-                        <FontAwesomeIcon icon="trash" />{' '}
-                        <span className="d-none d-md-inline">
-                          <Translate contentKey="entity.action.delete">Delete</Translate>
-                        </span>
-                      </Button>
+                      {isOwner(project) && (
+                        <Button
+                          as={Link as any}
+                          to={`/project/${project.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
+                          variant="primary"
+                          size="sm"
+                          data-cy="entityEditButton"
+                        >
+                          <FontAwesomeIcon icon="pencil-alt" />{' '}
+                          <span className="d-none d-md-inline">
+                            <Translate contentKey="entity.action.edit">Edit</Translate>
+                          </span>
+                        </Button>
+                      )}
                     </div>
                   </td>
                 </tr>

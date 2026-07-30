@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import { TextFormat, Translate } from 'react-jhipster';
 import { Link, useParams } from 'react-router';
 
+import { faCopy, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { APP_DATE_FORMAT } from 'app/config/constants';
@@ -12,6 +13,7 @@ import { getEntity } from './project.reducer';
 
 export const ProjectDetail = () => {
   const dispatch = useAppDispatch();
+  const [copied, setCopied] = useState(false);
 
   const { id } = useParams<'id'>();
 
@@ -20,6 +22,22 @@ export const ProjectDetail = () => {
   }, []);
 
   const projectEntity = useAppSelector(state => state.project.entity);
+  const account = useAppSelector(state => state.authentication.account);
+
+  const copyToClipboard = () => {
+    if (projectEntity?.id) {
+      navigator.clipboard.writeText(projectEntity.id);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const isOwner = () => {
+    if (!account || !projectEntity?.createdBy) return false;
+    const creatorLogin = projectEntity.createdBy.login || projectEntity.createdBy.id;
+    return creatorLogin === account.login;
+  };
+
   return (
     <Row>
       <Col md="8">
@@ -32,7 +50,21 @@ export const ProjectDetail = () => {
               <Translate contentKey="global.field.id">ID</Translate>
             </span>
           </dt>
-          <dd>{projectEntity.id}</dd>
+          <dd>
+            <span>{projectEntity.id}</span>
+            {projectEntity.id && (
+              <Button
+                variant="outline-secondary"
+                size="sm"
+                className="ms-2 py-0 px-2"
+                onClick={copyToClipboard}
+                title="Copy ID to clipboard"
+              >
+                <FontAwesomeIcon icon={copied ? faCheck : faCopy} />
+                <span className="ms-1 d-none d-md-inline">{copied ? 'Copied!' : 'Copy'}</span>
+              </Button>
+            )}
+          </dd>
           <dt>
             <span id="name">
               <Translate contentKey="spec2UmlApp.project.name">Name</Translate>
@@ -107,12 +139,14 @@ export const ProjectDetail = () => {
           </span>
         </Button>
         &nbsp;
-        <Button as={Link as any} to={`/project/${projectEntity.id}/edit`} replace variant="primary">
-          <FontAwesomeIcon icon="pencil-alt" />{' '}
-          <span className="d-none d-md-inline">
-            <Translate contentKey="entity.action.edit">Edit</Translate>
-          </span>
-        </Button>
+        {isOwner() && (
+          <Button as={Link as any} to={`/project/${projectEntity.id}/edit`} replace variant="primary">
+            <FontAwesomeIcon icon="pencil-alt" />{' '}
+            <span className="d-none d-md-inline">
+              <Translate contentKey="entity.action.edit">Edit</Translate>
+            </span>
+          </Button>
+        )}
       </Col>
     </Row>
   );
