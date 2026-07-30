@@ -1,27 +1,25 @@
 import React, { useEffect } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import { Translate, ValidatedField, ValidatedForm, translate } from 'react-jhipster';
-import { Link, useNavigate, useParams } from 'react-router';
+import { Link, useNavigate, useParams, useLocation } from 'react-router';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getUsers } from 'app/modules/administration/user-management/user-management.reducer';
 import { Language } from 'app/shared/model/enumerations/language.model';
-import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
 
 import { createEntity, getEntity, reset, updateEntity } from './project.reducer';
 
 export const ProjectUpdate = () => {
   const dispatch = useAppDispatch();
-
   const navigate = useNavigate();
+  const location = useLocation();
 
   const { id } = useParams<'id'>();
   const isNew = id === undefined;
 
-  const projectStatisticses = useAppSelector(state => state.projectStatistics.entities);
   const users = useAppSelector(state => state.userManagement.users);
   const projectEntity = useAppSelector(state => state.project.entity);
   const loading = useAppSelector(state => state.project.loading);
@@ -49,14 +47,9 @@ export const ProjectUpdate = () => {
   }, [updateSuccess]);
 
   const saveEntity = values => {
-    values.createdAt = convertDateTimeToServer(values.createdAt);
-    values.updatedAt = convertDateTimeToServer(values.updatedAt);
-
     const entity = {
       ...projectEntity,
       ...values,
-      statistics: projectStatisticses.find(it => it.id.toString() === values.statistics?.toString()),
-      createdBy: users.find(it => it.id.toString() === values.createdBy?.toString()),
       annotatorses: mapIdList(values.annotatorses),
       reviewerses: mapIdList(values.reviewerses),
     };
@@ -71,16 +64,11 @@ export const ProjectUpdate = () => {
   const defaultValues = () =>
     isNew
       ? {
-          createdAt: displayDefaultDateTime(),
-          updatedAt: displayDefaultDateTime(),
+          language: 'EN',
         }
       : {
           language: 'EN',
           ...projectEntity,
-          createdAt: convertDateTimeFromServer(projectEntity.createdAt),
-          updatedAt: convertDateTimeFromServer(projectEntity.updatedAt),
-          statistics: projectEntity?.statistics?.id,
-          createdBy: projectEntity?.createdBy?.id,
           annotatorses: projectEntity?.annotatorses?.map(e => e.id.toString()),
           reviewerses: projectEntity?.reviewerses?.map(e => e.id.toString()),
         };
@@ -148,57 +136,6 @@ export const ProjectUpdate = () => {
                 type="text"
               />
               <ValidatedField
-                label={translate('spec2UmlApp.project.createdAt')}
-                id="project-createdAt"
-                name="createdAt"
-                data-cy="createdAt"
-                type="datetime-local"
-                placeholder="YYYY-MM-DD HH:mm"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                }}
-              />
-              <ValidatedField
-                label={translate('spec2UmlApp.project.updatedAt')}
-                id="project-updatedAt"
-                name="updatedAt"
-                data-cy="updatedAt"
-                type="datetime-local"
-                placeholder="YYYY-MM-DD HH:mm"
-              />
-              <ValidatedField
-                id="project-statistics"
-                name="statistics"
-                data-cy="statistics"
-                label={translate('spec2UmlApp.project.statistics')}
-                type="select"
-              >
-                <option value="" key="0" />
-                {projectStatisticses
-                  ? projectStatisticses.map(otherEntity => (
-                      <option value={otherEntity.id} key={otherEntity.id}>
-                        {otherEntity.id}
-                      </option>
-                    ))
-                  : null}
-              </ValidatedField>
-              <ValidatedField
-                id="project-createdBy"
-                name="createdBy"
-                data-cy="createdBy"
-                label={translate('spec2UmlApp.project.createdBy')}
-                type="select"
-              >
-                <option value="" key="0" />
-                {users
-                  ? users.map(otherEntity => (
-                      <option value={otherEntity.id} key={otherEntity.id}>
-                        {otherEntity.id}
-                      </option>
-                    ))
-                  : null}
-              </ValidatedField>
-              <ValidatedField
                 label={translate('spec2UmlApp.project.annotators')}
                 id="project-annotators"
                 data-cy="annotators"
@@ -210,7 +147,7 @@ export const ProjectUpdate = () => {
                 {users
                   ? users.map(otherEntity => (
                       <option value={otherEntity.id} key={otherEntity.id}>
-                        {otherEntity.id}
+                        {otherEntity.login || otherEntity.id}
                       </option>
                     ))
                   : null}
@@ -227,7 +164,7 @@ export const ProjectUpdate = () => {
                 {users
                   ? users.map(otherEntity => (
                       <option value={otherEntity.id} key={otherEntity.id}>
-                        {otherEntity.id}
+                        {otherEntity.login || otherEntity.id}
                       </option>
                     ))
                   : null}

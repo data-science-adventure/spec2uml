@@ -42,7 +42,6 @@ public class ProjectDTO implements Serializable {
 
     private String umlVersion;
 
-    @NotNull
     private Instant createdAt;
 
     private Instant updatedAt;

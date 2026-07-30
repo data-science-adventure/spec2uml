@@ -70,13 +70,9 @@ export const ProjectDetail = () => {
           </dt>
           <dd>{projectEntity.updatedAt ? <TextFormat value={projectEntity.updatedAt} type="date" format={APP_DATE_FORMAT} /> : null}</dd>
           <dt>
-            <Translate contentKey="spec2UmlApp.project.statistics">Statistics</Translate>
-          </dt>
-          <dd>{projectEntity.statistics ? projectEntity.statistics.id : ''}</dd>
-          <dt>
             <Translate contentKey="spec2UmlApp.project.createdBy">Created By</Translate>
           </dt>
-          <dd>{projectEntity.createdBy ? projectEntity.createdBy.id : ''}</dd>
+          <dd>{projectEntity.createdBy ? projectEntity.createdBy.login || projectEntity.createdBy.id : ''}</dd>
           <dt>
             <Translate contentKey="spec2UmlApp.project.annotators">Annotators</Translate>
           </dt>
@@ -84,7 +80,7 @@ export const ProjectDetail = () => {
             {projectEntity.annotatorses
               ? projectEntity.annotatorses.map((val, i) => (
                   <span key={val.id}>
-                    <a>{val.id}</a>
+                    <a>{val.login || val.id}</a>
                     {projectEntity.annotatorses && i === projectEntity.annotatorses.length - 1 ? '' : ', '}
                   </span>
                 ))
@@ -97,7 +93,7 @@ export const ProjectDetail = () => {
             {projectEntity.reviewerses
               ? projectEntity.reviewerses.map((val, i) => (
                   <span key={val.id}>
-                    <a>{val.id}</a>
+                    <a>{val.login || val.id}</a>
                     {projectEntity.reviewerses && i === projectEntity.reviewerses.length - 1 ? '' : ', '}
                   </span>
                 ))

@@ -1,8 +1,12 @@
 package com.github.danimaniarqsoft.service;
 
+import com.github.danimaniarqsoft.domain.Project;
 import com.github.danimaniarqsoft.repository.ProjectRepository;
+import com.github.danimaniarqsoft.repository.UserRepository;
+import com.github.danimaniarqsoft.security.SecurityUtils;
 import com.github.danimaniarqsoft.service.dto.ProjectDTO;
 import com.github.danimaniarqsoft.service.mapper.ProjectMapper;
+import java.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -20,37 +24,75 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
 
+    private final UserRepository userRepository;
+
     private final ProjectMapper projectMapper;
 
-    public ProjectService(ProjectRepository projectRepository, ProjectMapper projectMapper) {
+    public ProjectService(ProjectRepository projectRepository, UserRepository userRepository, ProjectMapper projectMapper) {
         this.projectRepository = projectRepository;
+        this.userRepository = userRepository;
         this.projectMapper = projectMapper;
     }
 
     /**
      * Save a project.
      *
+     * Sets createdAt and updatedAt to the current time, and resolves createdBy
+     * from the Security Context.
+     *
      * @param projectDTO the entity to save.
      * @return the persisted entity.
      */
     public Mono<ProjectDTO> save(ProjectDTO projectDTO) {
         LOG.debug("Request to save Project : {}", projectDTO);
-        return projectRepository.save(projectMapper.toEntity(projectDTO)).map(projectMapper::toDto);
+
+        Project entity = projectMapper.toEntity(projectDTO);
+        Instant now = Instant.now();
+        entity.setCreatedAt(now);
+        entity.setUpdatedAt(now);
+
+        return SecurityUtils.getCurrentUserLogin()
+            .flatMap(userRepository::findOneByLogin)
+            .map(currentUser -> {
+                entity.setCreatedBy(currentUser);
+                return entity;
+            })
+            .defaultIfEmpty(entity)
+            .flatMap(projectRepository::save)
+            .map(projectMapper::toDto);
     }
 
     /**
      * Update a project.
+     *
+     * Preserves existing createdAt and createdBy from the database,
+     * while updating updatedAt to the current time.
      *
      * @param projectDTO the entity to save.
      * @return the persisted entity.
      */
     public Mono<ProjectDTO> update(ProjectDTO projectDTO) {
         LOG.debug("Request to update Project : {}", projectDTO);
-        return projectRepository.save(projectMapper.toEntity(projectDTO)).map(projectMapper::toDto);
+
+        return projectRepository.findById(projectDTO.getId()).flatMap(existingProject -> {
+            Project entityToSave = projectMapper.toEntity(projectDTO);
+
+            // Preserve original system attributes
+            entityToSave.setCreatedAt(existingProject.getCreatedAt());
+            entityToSave.setCreatedBy(existingProject.getCreatedBy());
+
+            // System updates modification timestamp
+            entityToSave.setUpdatedAt(Instant.now());
+
+            return projectRepository.save(entityToSave).map(projectMapper::toDto);
+        });
     }
 
     /**
      * Partially update a project.
+     *
+     * Ignores incoming values for createdAt and createdBy, while updating
+     * updatedAt to the current time.
      *
      * @param projectDTO the entity to update partially.
      * @return the persisted entity.
@@ -61,7 +103,15 @@ public class ProjectService {
         return projectRepository
             .findById(projectDTO.getId())
             .map(existingProject -> {
+                // Ignore client-supplied system attributes before mapping
+                projectDTO.setCreatedAt(null);
+                projectDTO.setCreatedBy(null);
+                projectDTO.setUpdatedAt(null);
+
                 projectMapper.partialUpdate(existingProject, projectDTO);
+
+                // Set system updated timestamp
+                existingProject.setUpdatedAt(Instant.now());
 
                 return existingProject;
             })
@@ -91,8 +141,8 @@ public class ProjectService {
 
     /**
      * Returns the number of projects available.
-     * @return the number of entities in the database.
      *
+     * @return the number of entities in the database.
      */
     public Mono<Long> countAll() {
         return projectRepository.count();

@@ -140,9 +140,6 @@ export const Project = () => {
                   <FontAwesomeIcon icon={getSortIconByFieldName('updatedAt')} />
                 </th>
                 <th>
-                  <Translate contentKey="spec2UmlApp.project.statistics">Statistics</Translate> <FontAwesomeIcon icon="sort" />
-                </th>
-                <th>
                   <Translate contentKey="spec2UmlApp.project.createdBy">Created By</Translate> <FontAwesomeIcon icon="sort" />
                 </th>
                 <th />
@@ -164,10 +161,7 @@ export const Project = () => {
                   <td>{project.umlVersion}</td>
                   <td>{project.createdAt ? <TextFormat type="date" value={project.createdAt} format={APP_DATE_FORMAT} /> : null}</td>
                   <td>{project.updatedAt ? <TextFormat type="date" value={project.updatedAt} format={APP_DATE_FORMAT} /> : null}</td>
-                  <td>
-                    {project.statistics ? <Link to={`/project-statistics/${project.statistics.id}`}>{project.statistics.id}</Link> : ''}
-                  </td>
-                  <td>{project.createdBy ? project.createdBy.id : ''}</td>
+                  <td>{project.createdBy ? project.createdBy.login || project.createdBy.id : ''}</td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
                       <Button as={Link as any} to={`/project/${project.id}`} variant="info" size="sm" data-cy="entityDetailsButton">
