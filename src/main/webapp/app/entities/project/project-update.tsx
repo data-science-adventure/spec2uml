@@ -8,7 +8,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getUsers } from 'app/modules/administration/user-management/user-management.reducer';
 import { Language } from 'app/shared/model/enumerations/language.model';
-import { mapIdList } from 'app/shared/util/entity-utils';
 
 import { createEntity, getEntity, reset, updateEntity } from './project.reducer';
 
@@ -46,12 +45,29 @@ export const ProjectUpdate = () => {
     }
   }, [updateSuccess]);
 
+  /**
+   * Helper function to map selected user IDs to objects containing both id and login.
+   */
+  const mapUserList = (selectedIds: any, userList: any[]) => {
+    if (!selectedIds) return [];
+    const ids = Array.isArray(selectedIds) ? selectedIds : [selectedIds];
+    return ids
+      .filter(userId => userId !== '' && userId !== null && userId !== undefined)
+      .map(userId => {
+        const foundUser = userList?.find(u => u.id.toString() === userId.toString());
+        return {
+          id: userId,
+          login: foundUser ? foundUser.login : undefined,
+        };
+      });
+  };
+
   const saveEntity = values => {
     const entity = {
       ...projectEntity,
       ...values,
-      annotatorses: mapIdList(values.annotatorses),
-      reviewerses: mapIdList(values.reviewerses),
+      annotatorses: mapUserList(values.annotatorses, users),
+      reviewerses: mapUserList(values.reviewerses, users),
     };
 
     if (isNew) {

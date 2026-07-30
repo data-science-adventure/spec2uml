@@ -120,14 +120,17 @@ public class ProjectService {
     }
 
     /**
-     * Get all the projects.
+     * Get all projects where the currently authenticated user is the owner (createdBy),
+     * an annotator (annotatorses), or a reviewer (reviewerses).
      *
      * @param pageable the pagination information.
-     * @return the list of entities.
+     * @return the filtered list of entities.
      */
     public Flux<ProjectDTO> findAll(Pageable pageable) {
-        LOG.debug("Request to get all Projects");
-        return projectRepository.findAllBy(pageable).map(projectMapper::toDto);
+        LOG.debug("Request to get all Projects for current user");
+        return SecurityUtils.getCurrentUserLogin()
+            .flatMapMany(userLogin -> projectRepository.findByCurrentUser(userLogin, pageable))
+            .map(projectMapper::toDto);
     }
 
     /**
@@ -140,12 +143,12 @@ public class ProjectService {
     }
 
     /**
-     * Returns the number of projects available.
+     * Returns the total number of projects available to the currently authenticated user.
      *
-     * @return the number of entities in the database.
+     * @return the number of matching entities in the database.
      */
     public Mono<Long> countAll() {
-        return projectRepository.count();
+        return SecurityUtils.getCurrentUserLogin().flatMap(projectRepository::countByCurrentUser).defaultIfEmpty(0L);
     }
 
     /**
