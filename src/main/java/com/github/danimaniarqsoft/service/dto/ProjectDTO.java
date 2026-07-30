@@ -46,16 +46,16 @@ public class ProjectDTO implements Serializable {
 
     private Instant updatedAt;
 
-    private UserDTO createdBy;
+    private UserRefDTO createdBy;
 
     @Builder.Default
-    private Set<UserDTO> annotatorses = new HashSet<>();
+    private Set<UserRefDTO> annotatorses = new HashSet<>();
 
     @Builder.Default
-    private Set<UserDTO> reviewerses = new HashSet<>();
+    private Set<UserRefDTO> reviewerses = new HashSet<>();
 
     // Defensive getter for annotatorses to prevent NullPointerExceptions
-    public Set<UserDTO> getAnnotatorses() {
+    public Set<UserRefDTO> getAnnotatorses() {
         if (this.annotatorses == null) {
             this.annotatorses = new HashSet<>();
         }
@@ -63,7 +63,7 @@ public class ProjectDTO implements Serializable {
     }
 
     // Defensive getter for reviewerses to prevent NullPointerExceptions
-    public Set<UserDTO> getReviewerses() {
+    public Set<UserRefDTO> getReviewerses() {
         if (this.reviewerses == null) {
             this.reviewerses = new HashSet<>();
         }

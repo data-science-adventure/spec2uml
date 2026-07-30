@@ -61,18 +61,18 @@ public class Project implements Serializable {
     private Instant updatedAt;
 
     @Field("createdBy")
-    private User createdBy;
+    private UserRef createdBy;
 
     @Field("annotatorses")
     @Builder.Default
-    private Set<User> annotatorses = new HashSet<>();
+    private Set<UserRef> annotatorses = new HashSet<>();
 
     @Field("reviewerses")
     @Builder.Default
-    private Set<User> reviewerses = new HashSet<>();
+    private Set<UserRef> reviewerses = new HashSet<>();
 
     // Defensive getter for annotatorses to prevent NullPointerExceptions
-    public Set<User> getAnnotatorses() {
+    public Set<UserRef> getAnnotatorses() {
         if (this.annotatorses == null) {
             this.annotatorses = new HashSet<>();
         }
@@ -80,7 +80,7 @@ public class Project implements Serializable {
     }
 
     // Defensive getter for reviewerses to prevent NullPointerExceptions
-    public Set<User> getReviewerses() {
+    public Set<UserRef> getReviewerses() {
         if (this.reviewerses == null) {
             this.reviewerses = new HashSet<>();
         }
@@ -88,22 +88,22 @@ public class Project implements Serializable {
     }
 
     // Domain helper methods for managing relations
-    public Project addAnnotators(User user) {
+    public Project addAnnotators(UserRef user) {
         getAnnotatorses().add(user);
         return this;
     }
 
-    public Project removeAnnotators(User user) {
+    public Project removeAnnotators(UserRef user) {
         getAnnotatorses().remove(user);
         return this;
     }
 
-    public Project addReviewers(User user) {
+    public Project addReviewers(UserRef user) {
         getReviewerses().add(user);
         return this;
     }
 
-    public Project removeReviewers(User user) {
+    public Project removeReviewers(UserRef user) {
         getReviewerses().remove(user);
         return this;
     }

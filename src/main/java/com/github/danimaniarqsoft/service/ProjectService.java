@@ -1,11 +1,13 @@
 package com.github.danimaniarqsoft.service;
 
 import com.github.danimaniarqsoft.domain.Project;
+import com.github.danimaniarqsoft.domain.UserRef;
 import com.github.danimaniarqsoft.repository.ProjectRepository;
 import com.github.danimaniarqsoft.repository.UserRepository;
 import com.github.danimaniarqsoft.security.SecurityUtils;
 import com.github.danimaniarqsoft.service.dto.ProjectDTO;
 import com.github.danimaniarqsoft.service.mapper.ProjectMapper;
+import com.github.danimaniarqsoft.service.mapper.UserRefMapper;
 import java.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,17 +30,25 @@ public class ProjectService {
 
     private final ProjectMapper projectMapper;
 
-    public ProjectService(ProjectRepository projectRepository, UserRepository userRepository, ProjectMapper projectMapper) {
+    private final UserRefMapper userRefMapper;
+
+    public ProjectService(
+        ProjectRepository projectRepository,
+        UserRepository userRepository,
+        ProjectMapper projectMapper,
+        UserRefMapper userRefMapper
+    ) {
         this.projectRepository = projectRepository;
         this.userRepository = userRepository;
         this.projectMapper = projectMapper;
+        this.userRefMapper = userRefMapper;
     }
 
     /**
      * Save a project.
      *
      * Sets createdAt and updatedAt to the current time, and resolves createdBy
-     * from the Security Context.
+     * as a lightweight UserRef from the Security Context.
      *
      * @param projectDTO the entity to save.
      * @return the persisted entity.
@@ -54,7 +64,8 @@ public class ProjectService {
         return SecurityUtils.getCurrentUserLogin()
             .flatMap(userRepository::findOneByLogin)
             .map(currentUser -> {
-                entity.setCreatedBy(currentUser);
+                UserRef userRef = userRefMapper.userToUserRef(currentUser);
+                entity.setCreatedBy(userRef);
                 return entity;
             })
             .defaultIfEmpty(entity)
