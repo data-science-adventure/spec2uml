@@ -1,31 +1,17 @@
 package com.github.danimaniarqsoft.service.dto;
 
-import jakarta.validation.constraints.*;
 import java.io.Serializable;
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * A DTO for the {@link com.github.danimaniarqsoft.domain.ClassConcept} entity.
- */
-@SuppressWarnings("common-java:DuplicatedBlocks")
 public class ClassConceptDTO implements Serializable {
 
-    private String id;
+    private static final long serialVersionUID = 1L;
 
-    @NotNull
     private String name;
-
     private String stereotype;
-
-    private RequirementClassConceptsDTO requirementClassConcepts;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
+    private List<ClassAttributeDTO> attributes = new ArrayList<>();
+    private List<ClassOperationDTO> operations = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -43,43 +29,19 @@ public class ClassConceptDTO implements Serializable {
         this.stereotype = stereotype;
     }
 
-    public RequirementClassConceptsDTO getRequirementClassConcepts() {
-        return requirementClassConcepts;
+    public List<ClassAttributeDTO> getAttributes() {
+        return attributes;
     }
 
-    public void setRequirementClassConcepts(RequirementClassConceptsDTO requirementClassConcepts) {
-        this.requirementClassConcepts = requirementClassConcepts;
+    public void setAttributes(List<ClassAttributeDTO> attributes) {
+        this.attributes = attributes;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof ClassConceptDTO)) {
-            return false;
-        }
-
-        ClassConceptDTO classConceptDTO = (ClassConceptDTO) o;
-        if (this.id == null) {
-            return false;
-        }
-        return Objects.equals(this.id, classConceptDTO.id);
+    public List<ClassOperationDTO> getOperations() {
+        return operations;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.id);
-    }
-
-    // prettier-ignore
-    @Override
-    public String toString() {
-        return "ClassConceptDTO{" +
-            "id='" + getId() + "'" +
-            ", name='" + getName() + "'" +
-            ", stereotype='" + getStereotype() + "'" +
-            ", requirementClassConcepts=" + getRequirementClassConcepts() +
-            "}";
+    public void setOperations(List<ClassOperationDTO> operations) {
+        this.operations = operations;
     }
 }

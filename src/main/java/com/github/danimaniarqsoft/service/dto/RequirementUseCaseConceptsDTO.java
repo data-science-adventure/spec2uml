@@ -1,50 +1,42 @@
 package com.github.danimaniarqsoft.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * A DTO for the {@link com.github.danimaniarqsoft.domain.RequirementUseCaseConcepts} entity.
- */
-@SuppressWarnings("common-java:DuplicatedBlocks")
 public class RequirementUseCaseConceptsDTO implements Serializable {
 
-    private String id;
+    private static final long serialVersionUID = 1L;
 
-    public String getId() {
-        return id;
+    private List<UseCaseActorDTO> actors = new ArrayList<>();
+
+    @JsonProperty("use_cases")
+    private List<UseCaseConceptDTO> useCases = new ArrayList<>();
+
+    private List<UseCaseRelationshipDTO> relationships = new ArrayList<>();
+
+    public List<UseCaseActorDTO> getActors() {
+        return actors;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setActors(List<UseCaseActorDTO> actors) {
+        this.actors = actors;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof RequirementUseCaseConceptsDTO)) {
-            return false;
-        }
-
-        RequirementUseCaseConceptsDTO requirementUseCaseConceptsDTO = (RequirementUseCaseConceptsDTO) o;
-        if (this.id == null) {
-            return false;
-        }
-        return Objects.equals(this.id, requirementUseCaseConceptsDTO.id);
+    public List<UseCaseConceptDTO> getUseCases() {
+        return useCases;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.id);
+    public void setUseCases(List<UseCaseConceptDTO> useCases) {
+        this.useCases = useCases;
     }
 
-    // prettier-ignore
-    @Override
-    public String toString() {
-        return "RequirementUseCaseConceptsDTO{" +
-            "id='" + getId() + "'" +
-            "}";
+    public List<UseCaseRelationshipDTO> getRelationships() {
+        return relationships;
+    }
+
+    public void setRelationships(List<UseCaseRelationshipDTO> relationships) {
+        this.relationships = relationships;
     }
 }

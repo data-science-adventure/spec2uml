@@ -58,13 +58,11 @@ public class Requirement implements Serializable {
     private RequirementUseCaseConcepts useCaseConcepts;
 
     @Field("classConcepts")
-    private RequirementClassConcepts classConcepts;
+    private RequirementClassConcepts classConcepts = new RequirementClassConcepts();
 
-    @NotNull
     @Field("status")
     private RequirementStatus status;
 
-    @NotNull
     @Field("created_at")
     private Instant createdAt;
 

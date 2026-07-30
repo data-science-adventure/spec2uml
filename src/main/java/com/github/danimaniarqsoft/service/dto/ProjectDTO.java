@@ -31,8 +31,6 @@ public class ProjectDTO implements Serializable {
 
     private Instant updatedAt;
 
-    private ProjectStatisticsDTO statistics;
-
     private UserDTO createdBy;
 
     private Set<UserDTO> annotatorses = new HashSet<>();
@@ -95,14 +93,6 @@ public class ProjectDTO implements Serializable {
         this.updatedAt = updatedAt;
     }
 
-    public ProjectStatisticsDTO getStatistics() {
-        return statistics;
-    }
-
-    public void setStatistics(ProjectStatisticsDTO statistics) {
-        this.statistics = statistics;
-    }
-
     public UserDTO getCreatedBy() {
         return createdBy;
     }
@@ -159,7 +149,6 @@ public class ProjectDTO implements Serializable {
             ", umlVersion='" + getUmlVersion() + "'" +
             ", createdAt='" + getCreatedAt() + "'" +
             ", updatedAt='" + getUpdatedAt() + "'" +
-            ", statistics=" + getStatistics() +
             ", createdBy=" + getCreatedBy() +
             ", annotatorses=" + getAnnotatorses() +
             ", reviewerses=" + getReviewerses() +

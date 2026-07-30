@@ -1,50 +1,45 @@
 package com.github.danimaniarqsoft.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * A DTO for the {@link com.github.danimaniarqsoft.domain.RequirementClassConcepts} entity.
+ * DTO representing class concepts extracted from requirement text.
  */
-@SuppressWarnings("common-java:DuplicatedBlocks")
 public class RequirementClassConceptsDTO implements Serializable {
 
-    private String id;
+    private static final long serialVersionUID = 1L;
 
-    public String getId() {
-        return id;
+    private List<ClassConceptDTO> classes = new ArrayList<>();
+
+    private List<ClassRelationshipDTO> relationships = new ArrayList<>();
+
+    @JsonProperty("confidence_score")
+    private Double confidenceScore;
+
+    public List<ClassConceptDTO> getClasses() {
+        return classes;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setClasses(List<ClassConceptDTO> classes) {
+        this.classes = classes;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof RequirementClassConceptsDTO)) {
-            return false;
-        }
-
-        RequirementClassConceptsDTO requirementClassConceptsDTO = (RequirementClassConceptsDTO) o;
-        if (this.id == null) {
-            return false;
-        }
-        return Objects.equals(this.id, requirementClassConceptsDTO.id);
+    public List<ClassRelationshipDTO> getRelationships() {
+        return relationships;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.id);
+    public void setRelationships(List<ClassRelationshipDTO> relationships) {
+        this.relationships = relationships;
     }
 
-    // prettier-ignore
-    @Override
-    public String toString() {
-        return "RequirementClassConceptsDTO{" +
-            "id='" + getId() + "'" +
-            "}";
+    public Double getConfidenceScore() {
+        return confidenceScore;
+    }
+
+    public void setConfidenceScore(Double confidenceScore) {
+        this.confidenceScore = confidenceScore;
     }
 }

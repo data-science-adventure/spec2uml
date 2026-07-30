@@ -1,35 +1,32 @@
 package com.github.danimaniarqsoft.service.dto;
 
-import jakarta.validation.constraints.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * A DTO for the {@link com.github.danimaniarqsoft.domain.UseCaseConcept} entity.
- */
-@SuppressWarnings("common-java:DuplicatedBlocks")
 public class UseCaseConceptDTO implements Serializable {
 
-    private String id;
+    private static final long serialVersionUID = 1L;
 
-    @NotNull
     private String name;
-
     private String description;
 
+    @JsonProperty("primary_actors")
+    private List<String> primaryActors = new ArrayList<>();
+
+    @JsonProperty("secondary_actors")
+    private List<String> secondaryActors = new ArrayList<>();
+
+    private List<String> preconditions = new ArrayList<>();
+    private List<String> postconditions = new ArrayList<>();
     private String trigger;
 
+    @JsonProperty("system_boundary")
     private String systemBoundary;
 
-    private RequirementUseCaseConceptsDTO requirementUseCaseConcepts;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
+    @JsonProperty("business_rules")
+    private List<String> businessRules = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -45,6 +42,38 @@ public class UseCaseConceptDTO implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<String> getPrimaryActors() {
+        return primaryActors;
+    }
+
+    public void setPrimaryActors(List<String> primaryActors) {
+        this.primaryActors = primaryActors;
+    }
+
+    public List<String> getSecondaryActors() {
+        return secondaryActors;
+    }
+
+    public void setSecondaryActors(List<String> secondaryActors) {
+        this.secondaryActors = secondaryActors;
+    }
+
+    public List<String> getPreconditions() {
+        return preconditions;
+    }
+
+    public void setPreconditions(List<String> preconditions) {
+        this.preconditions = preconditions;
+    }
+
+    public List<String> getPostconditions() {
+        return postconditions;
+    }
+
+    public void setPostconditions(List<String> postconditions) {
+        this.postconditions = postconditions;
     }
 
     public String getTrigger() {
@@ -63,45 +92,11 @@ public class UseCaseConceptDTO implements Serializable {
         this.systemBoundary = systemBoundary;
     }
 
-    public RequirementUseCaseConceptsDTO getRequirementUseCaseConcepts() {
-        return requirementUseCaseConcepts;
+    public List<String> getBusinessRules() {
+        return businessRules;
     }
 
-    public void setRequirementUseCaseConcepts(RequirementUseCaseConceptsDTO requirementUseCaseConcepts) {
-        this.requirementUseCaseConcepts = requirementUseCaseConcepts;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof UseCaseConceptDTO)) {
-            return false;
-        }
-
-        UseCaseConceptDTO useCaseConceptDTO = (UseCaseConceptDTO) o;
-        if (this.id == null) {
-            return false;
-        }
-        return Objects.equals(this.id, useCaseConceptDTO.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.id);
-    }
-
-    // prettier-ignore
-    @Override
-    public String toString() {
-        return "UseCaseConceptDTO{" +
-            "id='" + getId() + "'" +
-            ", name='" + getName() + "'" +
-            ", description='" + getDescription() + "'" +
-            ", trigger='" + getTrigger() + "'" +
-            ", systemBoundary='" + getSystemBoundary() + "'" +
-            ", requirementUseCaseConcepts=" + getRequirementUseCaseConcepts() +
-            "}";
+    public void setBusinessRules(List<String> businessRules) {
+        this.businessRules = businessRules;
     }
 }

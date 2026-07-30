@@ -1,41 +1,23 @@
 package com.github.danimaniarqsoft.service.dto;
 
-import jakarta.validation.constraints.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
-import java.util.Objects;
 
-/**
- * A DTO for the {@link com.github.danimaniarqsoft.domain.ClassRelationship} entity.
- */
-@SuppressWarnings("common-java:DuplicatedBlocks")
 public class ClassRelationshipDTO implements Serializable {
 
-    private String id;
+    private static final long serialVersionUID = 1L;
 
-    @NotNull
     private String source;
-
-    @NotNull
     private String target;
-
-    @NotNull
     private String type;
 
+    @JsonProperty("sourceMultiplicity")
     private String sourceMultiplicity;
 
+    @JsonProperty("targetMultiplicity")
     private String targetMultiplicity;
 
     private String label;
-
-    private RequirementClassConceptsDTO requirementClassConcepts;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public String getSource() {
         return source;
@@ -83,49 +65,5 @@ public class ClassRelationshipDTO implements Serializable {
 
     public void setLabel(String label) {
         this.label = label;
-    }
-
-    public RequirementClassConceptsDTO getRequirementClassConcepts() {
-        return requirementClassConcepts;
-    }
-
-    public void setRequirementClassConcepts(RequirementClassConceptsDTO requirementClassConcepts) {
-        this.requirementClassConcepts = requirementClassConcepts;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof ClassRelationshipDTO)) {
-            return false;
-        }
-
-        ClassRelationshipDTO classRelationshipDTO = (ClassRelationshipDTO) o;
-        if (this.id == null) {
-            return false;
-        }
-        return Objects.equals(this.id, classRelationshipDTO.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.id);
-    }
-
-    // prettier-ignore
-    @Override
-    public String toString() {
-        return "ClassRelationshipDTO{" +
-            "id='" + getId() + "'" +
-            ", source='" + getSource() + "'" +
-            ", target='" + getTarget() + "'" +
-            ", type='" + getType() + "'" +
-            ", sourceMultiplicity='" + getSourceMultiplicity() + "'" +
-            ", targetMultiplicity='" + getTargetMultiplicity() + "'" +
-            ", label='" + getLabel() + "'" +
-            ", requirementClassConcepts=" + getRequirementClassConcepts() +
-            "}";
     }
 }

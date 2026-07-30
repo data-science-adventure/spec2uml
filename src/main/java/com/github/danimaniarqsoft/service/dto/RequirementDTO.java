@@ -37,10 +37,8 @@ public class RequirementDTO implements Serializable {
 
     private String useCaseDiagram;
 
-    @NotNull
     private RequirementStatus status;
 
-    @NotNull
     private Instant createdAt;
 
     private Instant updatedAt;
@@ -49,7 +47,6 @@ public class RequirementDTO implements Serializable {
 
     private RequirementClassConceptsDTO classConcepts;
 
-    @NotNull
     private ProjectDTO project;
 
     private Set<UserDTO> annotatorses = new HashSet<>();

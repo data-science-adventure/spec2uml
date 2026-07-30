@@ -195,25 +195,4 @@ public class RequirementResource {
         Mono<RequirementDTO> requirementDTO = requirementService.findOne(id);
         return ResponseUtil.wrapOrNotFound(requirementDTO);
     }
-
-    /**
-     * {@code DELETE  /requirements/:id} : delete the "id" requirement.
-     *
-     * @param id the id of the requirementDTO to delete.
-     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
-     */
-    @DeleteMapping("/{id}")
-    public Mono<ResponseEntity<Void>> deleteRequirement(@PathVariable("id") String id) {
-        LOG.debug("REST request to delete Requirement : {}", id);
-        return requirementService
-            .delete(id)
-
-            .then(
-                Mono.just(
-                    ResponseEntity.noContent()
-                        .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id))
-                        .build()
-                )
-            );
-    }
 }
