@@ -303,8 +303,8 @@ export const ProjectDetail = () => {
 
         {/* Centered Modal Popup for Requirement Annotation View/Edit */}
         <Modal show={showAnnotateModal} onHide={handleCloseAnnotateModal} size="lg" centered>
-          <ModalHeader closeButton className="bg-primary text-white">
-            Requirement Annotation - Sent ID #{selectedRequirement?.sentId}
+          <ModalHeader closeButton closeVariant="white" className="bg-primary text-white">
+            <Modal.Title className="text-white fs-5">Requirement Annotation - Sent ID #{selectedRequirement?.sentId}</Modal.Title>
           </ModalHeader>
           <ModalBody>
             {selectedRequirement && (
