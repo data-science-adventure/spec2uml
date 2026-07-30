@@ -6,7 +6,18 @@ import Editor from '@monaco-editor/react';
 import plantumlEncoder from 'plantuml-encoder';
 import axios from 'axios';
 
-import { faCheck, faCopy, faEdit, faSave, faSort, faSortDown, faSortUp, faSync } from '@fortawesome/free-solid-svg-icons';
+import {
+  faArrowLeft,
+  faArrowRight,
+  faCheck,
+  faCopy,
+  faEdit,
+  faSave,
+  faSort,
+  faSortDown,
+  faSortUp,
+  faSync,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { APP_DATE_FORMAT } from 'app/config/constants';
@@ -31,7 +42,6 @@ const getPlantUmlSvgUrl = (code: string): string | null => {
 
 /**
  * Custom React Hook for full PlantUML validation via SVG inspection.
- * Performs real-time server syntax checks with debouncing.
  */
 const usePlantUmlValidation = (code: string) => {
   const [isValid, setIsValid] = useState<boolean>(true);
@@ -61,7 +71,6 @@ const usePlantUmlValidation = (code: string) => {
         const response = await fetch(url);
         const svgText = await response.text();
 
-        // PlantUML renders "Syntax Error" inside the SVG text when validation fails
         const hasSyntaxError = svgText.includes('Syntax Error') || svgText.includes('class="error"') || svgText.includes('fill="#FF0000"');
 
         if (hasSyntaxError) {
@@ -72,13 +81,12 @@ const usePlantUmlValidation = (code: string) => {
           setSvgContent(svgText);
         }
       } catch {
-        // Fallback in case of network issue
         setIsValid(false);
         setSvgContent('');
       } finally {
         setIsValidating(false);
       }
-    }, 400); // 400ms debounce to prevent excessive requests while typing
+    }, 400);
 
     return () => clearTimeout(timer);
   }, [code]);
@@ -88,7 +96,6 @@ const usePlantUmlValidation = (code: string) => {
 
 /**
  * PlantUMLPreview Component
- * Renders the validated SVG diagram safely via an <img> data URI, avoiding dangerouslySetInnerHTML.
  */
 const PlantUMLPreview: React.FC<{ code: string; isValid: boolean; svgContent: string; isValidating: boolean }> = ({
   code,
@@ -132,7 +139,6 @@ const PlantUMLPreview: React.FC<{ code: string; isValid: boolean; svgContent: st
     );
   }
 
-  // Convert raw SVG string safely into an encoded Data URI for standard <img> rendering
   const svgDataUri = `data:image/svg+xml;utf8,${encodeURIComponent(svgContent)}`;
 
   return (
@@ -184,6 +190,8 @@ export const ProjectDetail = () => {
   const totalItems = useAppSelector(state => state.requirement.totalItems);
   const loadingRequirements = useAppSelector(state => state.requirement.loading);
 
+  const totalPages = Math.ceil(totalItems / paginationState.itemsPerPage);
+
   useEffect(() => {
     if (id) {
       dispatch(getEntity(id));
@@ -191,17 +199,18 @@ export const ProjectDetail = () => {
     }
   }, [id, paginationState.activePage, paginationState.sort, paginationState.order]);
 
-  const loadProjectRequirements = () => {
+  const loadProjectRequirements = (pageNumber = paginationState.activePage) => {
     if (id) {
-      dispatch(
+      return dispatch(
         getEntitiesByProject({
           projectId: id,
-          page: paginationState.activePage - 1,
+          page: pageNumber - 1,
           size: paginationState.itemsPerPage,
           sort: `${paginationState.sort},${paginationState.order}`,
         }),
       );
     }
+    return null;
   };
 
   const handleRefresh = () => {
@@ -222,19 +231,69 @@ export const ProjectDetail = () => {
     return creatorLogin === account.login;
   };
 
-  // Annotate Modal Handlers
-  const handleOpenAnnotateModal = (requirement: IRequirement) => {
+  // Helper to load requirement data into modal form state
+  const selectRequirementForModal = (requirement: IRequirement) => {
     setSelectedRequirement(requirement);
     setAnnotateFormState({
       classDiagram: requirement.classDiagram || '',
       useCaseDiagram: requirement.useCaseDiagram || '',
     });
+  };
+
+  // Annotate Modal Handlers
+  const handleOpenAnnotateModal = (requirement: IRequirement) => {
+    selectRequirementForModal(requirement);
     setShowAnnotateModal(true);
   };
 
   const handleCloseAnnotateModal = () => {
     setSelectedRequirement(null);
     setShowAnnotateModal(false);
+  };
+
+  // Navigation Logic within the Modal
+  const currentRequirementIndex = selectedRequirement ? requirementList.findIndex(req => req.id === selectedRequirement.id) : -1;
+
+  const hasPreviousRequirement = currentRequirementIndex > 0 || paginationState.activePage > 1;
+  const hasNextRequirement =
+    (currentRequirementIndex >= 0 && currentRequirementIndex < requirementList.length - 1) || paginationState.activePage < totalPages;
+
+  const handlePreviousRequirement = async () => {
+    if (loadingRequirements) return;
+
+    if (currentRequirementIndex > 0) {
+      selectRequirementForModal(requirementList[currentRequirementIndex - 1]);
+    } else if (paginationState.activePage > 1) {
+      const nextPage = paginationState.activePage - 1;
+      setPaginationState(prev => ({ ...prev, activePage: nextPage }));
+
+      const actionResult = await loadProjectRequirements(nextPage);
+      if (actionResult && getEntitiesByProject.fulfilled.match(actionResult)) {
+        const newEntities: IRequirement[] = actionResult.payload.data;
+        if (newEntities && newEntities.length > 0) {
+          selectRequirementForModal(newEntities[newEntities.length - 1]);
+        }
+      }
+    }
+  };
+
+  const handleNextRequirement = async () => {
+    if (loadingRequirements) return;
+
+    if (currentRequirementIndex < requirementList.length - 1) {
+      selectRequirementForModal(requirementList[currentRequirementIndex + 1]);
+    } else if (paginationState.activePage < totalPages) {
+      const nextPage = paginationState.activePage + 1;
+      setPaginationState(prev => ({ ...prev, activePage: nextPage }));
+
+      const actionResult = await loadProjectRequirements(nextPage);
+      if (actionResult && getEntitiesByProject.fulfilled.match(actionResult)) {
+        const newEntities: IRequirement[] = actionResult.payload.data;
+        if (newEntities && newEntities.length > 0) {
+          selectRequirementForModal(newEntities[0]);
+        }
+      }
+    }
   };
 
   const handleClassDiagramChange = (value: string | undefined) => {
@@ -251,9 +310,6 @@ export const ProjectDetail = () => {
     }));
   };
 
-  /**
-   * Performs partial updates (PATCH) on the backend endpoint `/api/requirements/{id}`
-   */
   const handleSaveDiagram = async (field: 'classDiagram' | 'useCaseDiagram') => {
     if (!selectedRequirement?.id) return;
 
@@ -474,10 +530,17 @@ export const ProjectDetail = () => {
           </div>
         )}
 
-        {/* Modal Popup with Full SVG-based PlantUML Validation */}
+        {/* Modal Popup */}
         <Modal show={showAnnotateModal} onHide={handleCloseAnnotateModal} size="xl" centered>
           <ModalHeader closeButton closeVariant="white" className="bg-primary text-white">
-            <Modal.Title className="text-white fs-5">Requirement Annotation - Sent ID #{selectedRequirement?.sentId}</Modal.Title>
+            <Modal.Title className="text-white fs-5">
+              Requirement Annotation - Sent ID #{selectedRequirement?.sentId}
+              {loadingRequirements && (
+                <small className="ms-3 fs-6 opacity-75">
+                  <FontAwesomeIcon icon={faSync} spin /> Loading page data...
+                </small>
+              )}
+            </Modal.Title>
           </ModalHeader>
           <ModalBody>
             {selectedRequirement && (
@@ -575,7 +638,20 @@ export const ProjectDetail = () => {
               </div>
             )}
           </ModalBody>
-          <ModalFooter>
+          <ModalFooter className="d-flex justify-content-between">
+            <div>
+              <Button
+                variant="outline-primary"
+                className="me-2"
+                onClick={handlePreviousRequirement}
+                disabled={!hasPreviousRequirement || loadingRequirements}
+              >
+                <FontAwesomeIcon icon={faArrowLeft} /> Previous
+              </Button>
+              <Button variant="outline-primary" onClick={handleNextRequirement} disabled={!hasNextRequirement || loadingRequirements}>
+                Next <FontAwesomeIcon icon={faArrowRight} />
+              </Button>
+            </div>
             <Button variant="secondary" onClick={handleCloseAnnotateModal}>
               Close
             </Button>
