@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Button, Card, Col, Modal, ModalBody, ModalFooter, ModalHeader, Row, Table } from 'react-bootstrap';
 import { JhiItemCount, JhiPagination, TextFormat, Translate } from 'react-jhipster';
 import { Link, useParams } from 'react-router';
+import Editor from '@monaco-editor/react';
+import plantumlEncoder from 'plantuml-encoder';
 
 import { faCheck, faCopy, faEdit, faSort, faSortDown, faSortUp, faSync } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -13,6 +15,49 @@ import { IRequirement } from 'app/shared/model/requirement.model';
 import { ASC, DESC, ITEMS_PER_PAGE } from 'app/shared/util/pagination.constants';
 
 import { getEntity } from './project.reducer';
+
+/**
+ * Safely encodes PlantUML markup into an image URL.
+ * Extracted outside the component to keep React render logic clean and pure.
+ */
+const getPlantUmlUrl = (code: string): string | null => {
+  try {
+    const encoded = plantumlEncoder.encode(code);
+    return `https://www.plantuml.com/plantuml/png/${encoded}`;
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * PlantUMLPreview Component
+ * Encodes PlantUML text into a URL and renders the resulting PNG diagram from PlantUML server.
+ */
+const PlantUMLPreview: React.FC<{ code: string }> = ({ code }) => {
+  if (!code || !code.trim()) {
+    return (
+      <div className="d-flex align-items-center justify-content-center h-100 bg-light border rounded text-muted p-3">
+        <em>No diagram code provided</em>
+      </div>
+    );
+  }
+
+  const imageUrl = getPlantUmlUrl(code);
+
+  if (!imageUrl) {
+    return (
+      <div className="d-flex align-items-center justify-content-center h-100 bg-light border rounded text-danger p-3">
+        <em>Error encoding PlantUML diagram syntax</em>
+      </div>
+    );
+  }
+
+  return (
+    <div className="border rounded bg-white p-2 text-center overflow-auto" style={{ maxHeight: '200px', minHeight: '200px' }}>
+      <img src={imageUrl} alt="PlantUML Diagram" className="img-fluid" />
+    </div>
+  );
+};
 
 export const ProjectDetail = () => {
   const dispatch = useAppDispatch();
@@ -98,11 +143,17 @@ export const ProjectDetail = () => {
     setShowAnnotateModal(false);
   };
 
-  const handleDiagramChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+  const handleClassDiagramChange = (value: string | undefined) => {
     setAnnotateFormState(prevState => ({
       ...prevState,
-      [name]: value,
+      classDiagram: value || '',
+    }));
+  };
+
+  const handleUseCaseDiagramChange = (value: string | undefined) => {
+    setAnnotateFormState(prevState => ({
+      ...prevState,
+      useCaseDiagram: value || '',
     }));
   };
 
@@ -301,47 +352,73 @@ export const ProjectDetail = () => {
           </div>
         )}
 
-        {/* Centered Modal Popup for Requirement Annotation View/Edit */}
-        <Modal show={showAnnotateModal} onHide={handleCloseAnnotateModal} size="lg" centered>
+        {/* Centered Modal Popup for Requirement Annotation View/Edit with Side-by-Side Editors & Previews */}
+        <Modal show={showAnnotateModal} onHide={handleCloseAnnotateModal} size="xl" centered>
           <ModalHeader closeButton closeVariant="white" className="bg-primary text-white">
             <Modal.Title className="text-white fs-5">Requirement Annotation - Sent ID #{selectedRequirement?.sentId}</Modal.Title>
           </ModalHeader>
           <ModalBody>
             {selectedRequirement && (
               <div>
-                <div className="mb-3">
+                <div className="mb-4">
                   <label className="fw-bold form-label">Requirement Text:</label>
-                  <textarea className="form-control bg-light" rows={3} value={selectedRequirement.text || ''} readOnly />
+                  <textarea className="form-control bg-light" rows={2} value={selectedRequirement.text || ''} readOnly />
                 </div>
 
-                <div className="mb-3">
-                  <label className="fw-bold form-label" htmlFor="classDiagram">
-                    Class Diagram (PlantUML):
-                  </label>
-                  <textarea
-                    id="classDiagram"
-                    name="classDiagram"
-                    className="form-control font-monospace"
-                    rows={5}
-                    value={annotateFormState.classDiagram}
-                    onChange={handleDiagramChange}
-                    placeholder="Enter PlantUML class diagram code..."
-                  />
+                {/* Class Diagram Section */}
+                <div className="mb-4">
+                  <h6 className="fw-bold">Class Diagram</h6>
+                  <Row>
+                    <Col md={6}>
+                      <label className="form-label text-muted small">PlantUML Code:</label>
+                      <div className="border rounded overflow-hidden">
+                        <Editor
+                          height="200px"
+                          defaultLanguage="apex"
+                          theme="vs-light"
+                          value={annotateFormState.classDiagram}
+                          onChange={handleClassDiagramChange}
+                          options={{
+                            minimap: { enabled: false },
+                            scrollBeyondLastLine: false,
+                            fontSize: 13,
+                          }}
+                        />
+                      </div>
+                    </Col>
+                    <Col md={6}>
+                      <label className="form-label text-muted small">Diagram Preview:</label>
+                      <PlantUMLPreview code={annotateFormState.classDiagram} />
+                    </Col>
+                  </Row>
                 </div>
 
+                {/* Use Case Diagram Section */}
                 <div className="mb-3">
-                  <label className="fw-bold form-label" htmlFor="useCaseDiagram">
-                    Use Case Diagram (PlantUML):
-                  </label>
-                  <textarea
-                    id="useCaseDiagram"
-                    name="useCaseDiagram"
-                    className="form-control font-monospace"
-                    rows={5}
-                    value={annotateFormState.useCaseDiagram}
-                    onChange={handleDiagramChange}
-                    placeholder="Enter PlantUML use case diagram code..."
-                  />
+                  <h6 className="fw-bold">Use Case Diagram</h6>
+                  <Row>
+                    <Col md={6}>
+                      <label className="form-label text-muted small">PlantUML Code:</label>
+                      <div className="border rounded overflow-hidden">
+                        <Editor
+                          height="200px"
+                          defaultLanguage="apex"
+                          theme="vs-light"
+                          value={annotateFormState.useCaseDiagram}
+                          onChange={handleUseCaseDiagramChange}
+                          options={{
+                            minimap: { enabled: false },
+                            scrollBeyondLastLine: false,
+                            fontSize: 13,
+                          }}
+                        />
+                      </div>
+                    </Col>
+                    <Col md={6}>
+                      <label className="form-label text-muted small">Diagram Preview:</label>
+                      <PlantUMLPreview code={annotateFormState.useCaseDiagram} />
+                    </Col>
+                  </Row>
                 </div>
               </div>
             )}
