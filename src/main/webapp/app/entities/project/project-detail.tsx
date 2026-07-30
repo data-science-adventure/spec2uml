@@ -4,8 +4,9 @@ import { JhiItemCount, JhiPagination, TextFormat, Translate } from 'react-jhipst
 import { Link, useParams } from 'react-router';
 import Editor from '@monaco-editor/react';
 import plantumlEncoder from 'plantuml-encoder';
+import axios from 'axios';
 
-import { faCheck, faCopy, faEdit, faSort, faSortDown, faSortUp, faSync } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faCopy, faEdit, faSave, faSort, faSortDown, faSortUp, faSync } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { APP_DATE_FORMAT } from 'app/config/constants';
@@ -17,44 +18,129 @@ import { ASC, DESC, ITEMS_PER_PAGE } from 'app/shared/util/pagination.constants'
 import { getEntity } from './project.reducer';
 
 /**
- * Safely encodes PlantUML markup into an image URL.
- * Extracted outside the component to keep React render logic clean and pure.
+ * Encodes PlantUML text into an SVG URL.
  */
-const getPlantUmlUrl = (code: string): string | null => {
+const getPlantUmlSvgUrl = (code: string): string | null => {
   try {
     const encoded = plantumlEncoder.encode(code);
-    return `https://www.plantuml.com/plantuml/png/${encoded}`;
+    return `https://www.plantuml.com/plantuml/svg/${encoded}`;
   } catch {
     return null;
   }
 };
 
 /**
- * PlantUMLPreview Component
- * Encodes PlantUML text into a URL and renders the resulting PNG diagram from PlantUML server.
+ * Custom React Hook for full PlantUML validation via SVG inspection.
+ * Performs real-time server syntax checks with debouncing.
  */
-const PlantUMLPreview: React.FC<{ code: string }> = ({ code }) => {
+const usePlantUmlValidation = (code: string) => {
+  const [isValid, setIsValid] = useState<boolean>(true);
+  const [svgContent, setSvgContent] = useState<string>('');
+  const [isValidating, setIsValidating] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!code || !code.trim()) {
+      setIsValid(true);
+      setSvgContent('');
+      setIsValidating(false);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsValidating(true);
+      const url = getPlantUmlSvgUrl(code);
+
+      if (!url) {
+        setIsValid(false);
+        setSvgContent('');
+        setIsValidating(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(url);
+        const svgText = await response.text();
+
+        // PlantUML renders "Syntax Error" inside the SVG text when validation fails
+        const hasSyntaxError = svgText.includes('Syntax Error') || svgText.includes('class="error"') || svgText.includes('fill="#FF0000"');
+
+        if (hasSyntaxError) {
+          setIsValid(false);
+          setSvgContent('');
+        } else {
+          setIsValid(true);
+          setSvgContent(svgText);
+        }
+      } catch {
+        // Fallback in case of network issue
+        setIsValid(false);
+        setSvgContent('');
+      } finally {
+        setIsValidating(false);
+      }
+    }, 400); // 400ms debounce to prevent excessive requests while typing
+
+    return () => clearTimeout(timer);
+  }, [code]);
+
+  return { isValid, svgContent, isValidating };
+};
+
+/**
+ * PlantUMLPreview Component
+ * Renders the validated SVG diagram safely via an <img> data URI, avoiding dangerouslySetInnerHTML.
+ */
+const PlantUMLPreview: React.FC<{ code: string; isValid: boolean; svgContent: string; isValidating: boolean }> = ({
+  code,
+  isValid,
+  svgContent,
+  isValidating,
+}) => {
   if (!code || !code.trim()) {
     return (
-      <div className="d-flex align-items-center justify-content-center h-100 bg-light border rounded text-muted p-3">
+      <div
+        className="d-flex align-items-center justify-content-center h-100 bg-light border rounded text-muted p-3"
+        style={{ minHeight: '200px' }}
+      >
         <em>No diagram code provided</em>
       </div>
     );
   }
 
-  const imageUrl = getPlantUmlUrl(code);
-
-  if (!imageUrl) {
+  if (isValidating) {
     return (
-      <div className="d-flex align-items-center justify-content-center h-100 bg-light border rounded text-danger p-3">
-        <em>Error encoding PlantUML diagram syntax</em>
+      <div
+        className="d-flex align-items-center justify-content-center h-100 bg-light border rounded text-muted p-3"
+        style={{ minHeight: '200px' }}
+      >
+        <FontAwesomeIcon icon={faSync} spin className="me-2" /> Validating PlantUML diagram...
       </div>
     );
   }
 
+  if (!isValid) {
+    return (
+      <div
+        className="d-flex align-items-center justify-content-center h-100 bg-light border rounded text-danger p-3"
+        style={{ minHeight: '200px' }}
+      >
+        <div className="text-center">
+          <strong>Syntax Error</strong>
+          <div className="small text-muted mt-1">Please correct the PlantUML diagram syntax to enable saving.</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Convert raw SVG string safely into an encoded Data URI for standard <img> rendering
+  const svgDataUri = `data:image/svg+xml;utf8,${encodeURIComponent(svgContent)}`;
+
   return (
-    <div className="border rounded bg-white p-2 text-center overflow-auto" style={{ maxHeight: '200px', minHeight: '200px' }}>
-      <img src={imageUrl} alt="PlantUML Diagram" className="img-fluid" />
+    <div
+      className="border rounded bg-white p-2 text-center overflow-auto d-flex align-items-center justify-content-center"
+      style={{ maxHeight: '200px', minHeight: '200px' }}
+    >
+      <img src={svgDataUri} alt="PlantUML Diagram Preview" className="img-fluid" style={{ maxHeight: '180px' }} />
     </div>
   );
 };
@@ -70,11 +156,19 @@ export const ProjectDetail = () => {
   const [showAnnotateModal, setShowAnnotateModal] = useState(false);
   const [selectedRequirement, setSelectedRequirement] = useState<IRequirement | null>(null);
 
+  // Saving states for individual diagrams
+  const [savingClassDiagram, setSavingClassDiagram] = useState(false);
+  const [savingUseCaseDiagram, setSavingUseCaseDiagram] = useState(false);
+
   // State for editable diagram fields
   const [annotateFormState, setAnnotateFormState] = useState({
     classDiagram: '',
     useCaseDiagram: '',
   });
+
+  // Dynamic Hooks for Full PlantUML Validation
+  const classValidation = usePlantUmlValidation(annotateFormState.classDiagram);
+  const useCaseValidation = usePlantUmlValidation(annotateFormState.useCaseDiagram);
 
   const [paginationState, setPaginationState] = useState({
     activePage: 1,
@@ -157,6 +251,35 @@ export const ProjectDetail = () => {
     }));
   };
 
+  /**
+   * Performs partial updates (PATCH) on the backend endpoint `/api/requirements/{id}`
+   */
+  const handleSaveDiagram = async (field: 'classDiagram' | 'useCaseDiagram') => {
+    if (!selectedRequirement?.id) return;
+
+    const isClass = field === 'classDiagram';
+    if (isClass) setSavingClassDiagram(true);
+    else setSavingUseCaseDiagram(true);
+
+    const patchPayload = {
+      id: selectedRequirement.id,
+      classDiagram: isClass ? annotateFormState.classDiagram : null,
+      useCaseDiagram: isClass ? null : annotateFormState.useCaseDiagram,
+    };
+
+    try {
+      await axios.patch(`/api/requirements/${selectedRequirement.id}`, patchPayload, {
+        headers: { 'Content-Type': 'application/merge-patch+json' },
+      });
+      loadProjectRequirements();
+    } catch {
+      // Handle error cleanly
+    } finally {
+      if (isClass) setSavingClassDiagram(false);
+      else setSavingUseCaseDiagram(false);
+    }
+  };
+
   const handlePagination = currentPage => {
     setPaginationState({
       ...paginationState,
@@ -184,7 +307,7 @@ export const ProjectDetail = () => {
           <Translate contentKey="spec2UmlApp.project.detail.title">Project</Translate>
         </h2>
 
-        {/* Project Info displayed horizontally using Bootstrap Grid */}
+        {/* Project Info Card */}
         <Card className="mb-4 shadow-sm">
           <Card.Body>
             <Row className="g-3">
@@ -277,7 +400,7 @@ export const ProjectDetail = () => {
 
         <hr className="my-4" />
 
-        {/* Requirements Header Section */}
+        {/* Requirements Table Section */}
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h3>
             <Translate contentKey="spec2UmlApp.requirement.home.title">Requirements</Translate>
@@ -290,7 +413,6 @@ export const ProjectDetail = () => {
           </div>
         </div>
 
-        {/* Requirements Table showing only sentId, text, status, and Annotate button */}
         <div className="table-responsive">
           {requirementList && requirementList.length > 0 ? (
             <Table responsive striped>
@@ -352,7 +474,7 @@ export const ProjectDetail = () => {
           </div>
         )}
 
-        {/* Centered Modal Popup for Requirement Annotation View/Edit with Side-by-Side Editors & Previews */}
+        {/* Modal Popup with Full SVG-based PlantUML Validation */}
         <Modal show={showAnnotateModal} onHide={handleCloseAnnotateModal} size="xl" centered>
           <ModalHeader closeButton closeVariant="white" className="bg-primary text-white">
             <Modal.Title className="text-white fs-5">Requirement Annotation - Sent ID #{selectedRequirement?.sentId}</Modal.Title>
@@ -367,7 +489,17 @@ export const ProjectDetail = () => {
 
                 {/* Class Diagram Section */}
                 <div className="mb-4">
-                  <h6 className="fw-bold">Class Diagram</h6>
+                  <div className="d-flex justify-content-between align-items-center mb-2">
+                    <h6 className="fw-bold mb-0">Class Diagram</h6>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={() => handleSaveDiagram('classDiagram')}
+                      disabled={!classValidation.isValid || classValidation.isValidating || savingClassDiagram}
+                    >
+                      <FontAwesomeIcon icon={savingClassDiagram ? faSync : faSave} spin={savingClassDiagram} /> Save Class Diagram
+                    </Button>
+                  </div>
                   <Row>
                     <Col md={6}>
                       <label className="form-label text-muted small">PlantUML Code:</label>
@@ -388,14 +520,29 @@ export const ProjectDetail = () => {
                     </Col>
                     <Col md={6}>
                       <label className="form-label text-muted small">Diagram Preview:</label>
-                      <PlantUMLPreview code={annotateFormState.classDiagram} />
+                      <PlantUMLPreview
+                        code={annotateFormState.classDiagram}
+                        isValid={classValidation.isValid}
+                        svgContent={classValidation.svgContent}
+                        isValidating={classValidation.isValidating}
+                      />
                     </Col>
                   </Row>
                 </div>
 
                 {/* Use Case Diagram Section */}
                 <div className="mb-3">
-                  <h6 className="fw-bold">Use Case Diagram</h6>
+                  <div className="d-flex justify-content-between align-items-center mb-2">
+                    <h6 className="fw-bold mb-0">Use Case Diagram</h6>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={() => handleSaveDiagram('useCaseDiagram')}
+                      disabled={!useCaseValidation.isValid || useCaseValidation.isValidating || savingUseCaseDiagram}
+                    >
+                      <FontAwesomeIcon icon={savingUseCaseDiagram ? faSync : faSave} spin={savingUseCaseDiagram} /> Save Use Case Diagram
+                    </Button>
+                  </div>
                   <Row>
                     <Col md={6}>
                       <label className="form-label text-muted small">PlantUML Code:</label>
@@ -416,7 +563,12 @@ export const ProjectDetail = () => {
                     </Col>
                     <Col md={6}>
                       <label className="form-label text-muted small">Diagram Preview:</label>
-                      <PlantUMLPreview code={annotateFormState.useCaseDiagram} />
+                      <PlantUMLPreview
+                        code={annotateFormState.useCaseDiagram}
+                        isValid={useCaseValidation.isValid}
+                        svgContent={useCaseValidation.svgContent}
+                        isValidating={useCaseValidation.isValidating}
+                      />
                     </Col>
                   </Row>
                 </div>
@@ -425,7 +577,7 @@ export const ProjectDetail = () => {
           </ModalBody>
           <ModalFooter>
             <Button variant="secondary" onClick={handleCloseAnnotateModal}>
-              Cancel
+              Close
             </Button>
           </ModalFooter>
         </Modal>
