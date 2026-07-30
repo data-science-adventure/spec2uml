@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Col, Modal, ModalBody, ModalFooter, ModalHeader, Row, Table } from 'react-bootstrap';
-import { JhiItemCount, JhiPagination, TextFormat, Translate, ValidatedField, ValidatedForm, isNumber, translate } from 'react-jhipster';
+import { Button, Card, Col, Modal, ModalBody, ModalFooter, ModalHeader, Row, Table } from 'react-bootstrap';
+import { JhiItemCount, JhiPagination, TextFormat, Translate } from 'react-jhipster';
 import { Link, useParams } from 'react-router';
 
-import { faCheck, faCopy, faPlus, faSort, faSortDown, faSortUp, faSync } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faCopy, faEdit, faSort, faSortDown, faSortUp, faSync } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { APP_DATE_FORMAT } from 'app/config/constants';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
-import { createEntity, getEntitiesByProject } from 'app/entities/requirement/requirement.reducer';
+import { getEntitiesByProject } from 'app/entities/requirement/requirement.reducer';
+import { IRequirement } from 'app/shared/model/requirement.model';
 import { ASC, DESC, ITEMS_PER_PAGE } from 'app/shared/util/pagination.constants';
 
 import { getEntity } from './project.reducer';
@@ -19,7 +20,17 @@ export const ProjectDetail = () => {
 
   // State
   const [copied, setCopied] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+
+  // State for Annotate Modal
+  const [showAnnotateModal, setShowAnnotateModal] = useState(false);
+  const [selectedRequirement, setSelectedRequirement] = useState<IRequirement | null>(null);
+
+  // State for editable diagram fields
+  const [annotateFormState, setAnnotateFormState] = useState({
+    classDiagram: '',
+    useCaseDiagram: '',
+  });
+
   const [paginationState, setPaginationState] = useState({
     activePage: 1,
     itemsPerPage: ITEMS_PER_PAGE,
@@ -33,8 +44,6 @@ export const ProjectDetail = () => {
   const requirementList = useAppSelector(state => state.requirement.entities);
   const totalItems = useAppSelector(state => state.requirement.totalItems);
   const loadingRequirements = useAppSelector(state => state.requirement.loading);
-  const updatingRequirement = useAppSelector(state => state.requirement.updating);
-  const updateSuccess = useAppSelector(state => state.requirement.updateSuccess);
 
   useEffect(() => {
     if (id) {
@@ -42,13 +51,6 @@ export const ProjectDetail = () => {
       loadProjectRequirements();
     }
   }, [id, paginationState.activePage, paginationState.sort, paginationState.order]);
-
-  useEffect(() => {
-    if (updateSuccess && showModal) {
-      setShowModal(false);
-      loadProjectRequirements();
-    }
-  }, [updateSuccess]);
 
   const loadProjectRequirements = () => {
     if (id) {
@@ -81,20 +83,27 @@ export const ProjectDetail = () => {
     return creatorLogin === account.login;
   };
 
-  const handleOpenModal = () => setShowModal(true);
-  const handleCloseModal = () => setShowModal(false);
+  // Annotate Modal Handlers
+  const handleOpenAnnotateModal = (requirement: IRequirement) => {
+    setSelectedRequirement(requirement);
+    setAnnotateFormState({
+      classDiagram: requirement.classDiagram || '',
+      useCaseDiagram: requirement.useCaseDiagram || '',
+    });
+    setShowAnnotateModal(true);
+  };
 
-  const saveRequirement = values => {
-    if (values.sentId !== undefined && typeof values.sentId !== 'number') {
-      values.sentId = Number(values.sentId);
-    }
+  const handleCloseAnnotateModal = () => {
+    setSelectedRequirement(null);
+    setShowAnnotateModal(false);
+  };
 
-    const entity = {
-      ...values,
-      project: { id: projectEntity.id, name: projectEntity.name },
-    };
-
-    dispatch(createEntity(entity));
+  const handleDiagramChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setAnnotateFormState(prevState => ({
+      ...prevState,
+      [name]: value,
+    }));
   };
 
   const handlePagination = currentPage => {
@@ -120,88 +129,104 @@ export const ProjectDetail = () => {
   return (
     <Row>
       <Col md="12">
-        <h2 data-cy="projectDetailsHeading">
+        <h2 data-cy="projectDetailsHeading" className="mb-4">
           <Translate contentKey="spec2UmlApp.project.detail.title">Project</Translate>
         </h2>
-        <dl className="jh-entity-details">
-          <dt>
-            <span id="id">
-              <Translate contentKey="global.field.id">ID</Translate>
-            </span>
-          </dt>
-          <dd>
-            <span>{projectEntity.id}</span>
-            {projectEntity.id && (
-              <Button
-                variant="outline-secondary"
-                size="sm"
-                className="ms-2 py-0 px-2"
-                onClick={copyToClipboard}
-                title="Copy ID to clipboard"
-              >
-                <FontAwesomeIcon icon={copied ? faCheck : faCopy} />
-                <span className="ms-1 d-none d-md-inline">{copied ? 'Copied!' : 'Copy'}</span>
-              </Button>
-            )}
-          </dd>
-          <dt>
-            <span id="name">
-              <Translate contentKey="spec2UmlApp.project.name">Name</Translate>
-            </span>
-          </dt>
-          <dd>{projectEntity.name}</dd>
-          <dt>
-            <span id="description">
-              <Translate contentKey="spec2UmlApp.project.description">Description</Translate>
-            </span>
-          </dt>
-          <dd>{projectEntity.description}</dd>
-          <dt>
-            <span id="language">
-              <Translate contentKey="spec2UmlApp.project.language">Language</Translate>
-            </span>
-          </dt>
-          <dd>{projectEntity.language}</dd>
-          <dt>
-            <span id="umlVersion">
-              <Translate contentKey="spec2UmlApp.project.umlVersion">Uml Version</Translate>
-            </span>
-          </dt>
-          <dd>{projectEntity.umlVersion}</dd>
-          <dt>
-            <span id="createdAt">
-              <Translate contentKey="spec2UmlApp.project.createdAt">Created At</Translate>
-            </span>
-          </dt>
-          <dd>{projectEntity.createdAt ? <TextFormat value={projectEntity.createdAt} type="date" format={APP_DATE_FORMAT} /> : null}</dd>
-          <dt>
-            <span id="updatedAt">
-              <Translate contentKey="spec2UmlApp.project.updatedAt">Updated At</Translate>
-            </span>
-          </dt>
-          <dd>{projectEntity.updatedAt ? <TextFormat value={projectEntity.updatedAt} type="date" format={APP_DATE_FORMAT} /> : null}</dd>
-          <dt>
-            <Translate contentKey="spec2UmlApp.project.createdBy">Created By</Translate>
-          </dt>
-          <dd>{projectEntity.createdBy ? projectEntity.createdBy.login || projectEntity.createdBy.id : ''}</dd>
-        </dl>
-        <Button as={Link as any} to="/project" replace variant="info" data-cy="entityDetailsBackButton">
-          <FontAwesomeIcon icon="arrow-left" />{' '}
-          <span className="d-none d-md-inline">
-            <Translate contentKey="entity.action.back">Back</Translate>
-          </span>
-        </Button>
-        &nbsp;
-        {isOwner() && (
-          <Button as={Link as any} to={`/project/${projectEntity.id}/edit`} replace variant="primary">
-            <FontAwesomeIcon icon="pencil-alt" />{' '}
+
+        {/* Project Info displayed horizontally using Bootstrap Grid */}
+        <Card className="mb-4 shadow-sm">
+          <Card.Body>
+            <Row className="g-3">
+              <Col md={3} sm={6}>
+                <strong>
+                  <Translate contentKey="global.field.id">ID</Translate>:
+                </strong>
+                <div className="d-flex align-items-center mt-1">
+                  <span className="text-truncate">{projectEntity.id}</span>
+                  {projectEntity.id && (
+                    <Button
+                      variant="outline-secondary"
+                      size="sm"
+                      className="ms-2 py-0 px-2"
+                      onClick={copyToClipboard}
+                      title="Copy ID to clipboard"
+                    >
+                      <FontAwesomeIcon icon={copied ? faCheck : faCopy} />
+                    </Button>
+                  )}
+                </div>
+              </Col>
+              <Col md={3} sm={6}>
+                <strong>
+                  <Translate contentKey="spec2UmlApp.project.name">Name</Translate>:
+                </strong>
+                <div className="mt-1">{projectEntity.name}</div>
+              </Col>
+              <Col md={3} sm={6}>
+                <strong>
+                  <Translate contentKey="spec2UmlApp.project.description">Description</Translate>:
+                </strong>
+                <div className="mt-1">{projectEntity.description}</div>
+              </Col>
+              <Col md={3} sm={6}>
+                <strong>
+                  <Translate contentKey="spec2UmlApp.project.language">Language</Translate>:
+                </strong>
+                <div className="mt-1">{projectEntity.language}</div>
+              </Col>
+              <Col md={3} sm={6}>
+                <strong>
+                  <Translate contentKey="spec2UmlApp.project.umlVersion">Uml Version</Translate>:
+                </strong>
+                <div className="mt-1">{projectEntity.umlVersion}</div>
+              </Col>
+              <Col md={3} sm={6}>
+                <strong>
+                  <Translate contentKey="spec2UmlApp.project.createdAt">Created At</Translate>:
+                </strong>
+                <div className="mt-1">
+                  {projectEntity.createdAt ? <TextFormat value={projectEntity.createdAt} type="date" format={APP_DATE_FORMAT} /> : null}
+                </div>
+              </Col>
+              <Col md={3} sm={6}>
+                <strong>
+                  <Translate contentKey="spec2UmlApp.project.updatedAt">Updated At</Translate>:
+                </strong>
+                <div className="mt-1">
+                  {projectEntity.updatedAt ? <TextFormat value={projectEntity.updatedAt} type="date" format={APP_DATE_FORMAT} /> : null}
+                </div>
+              </Col>
+              <Col md={3} sm={6}>
+                <strong>
+                  <Translate contentKey="spec2UmlApp.project.createdBy">Created By</Translate>:
+                </strong>
+                <div className="mt-1">{projectEntity.createdBy ? projectEntity.createdBy.login || projectEntity.createdBy.id : ''}</div>
+              </Col>
+            </Row>
+          </Card.Body>
+        </Card>
+
+        <div className="mb-4">
+          <Button as={Link as any} to="/project" replace variant="info" data-cy="entityDetailsBackButton">
+            <FontAwesomeIcon icon="arrow-left" />{' '}
             <span className="d-none d-md-inline">
-              <Translate contentKey="entity.action.edit">Edit</Translate>
+              <Translate contentKey="entity.action.back">Back</Translate>
             </span>
           </Button>
-        )}
+          &nbsp;
+          {isOwner() && (
+            <Button as={Link as any} to={`/project/${projectEntity.id}/edit`} replace variant="primary">
+              <FontAwesomeIcon icon="pencil-alt" />{' '}
+              <span className="d-none d-md-inline">
+                <Translate contentKey="entity.action.edit">Edit</Translate>
+              </span>
+            </Button>
+          )}
+        </div>
+
         <hr className="my-4" />
-        {/* Requirements Section */}
+
+        {/* Requirements Header Section */}
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h3>
             <Translate contentKey="spec2UmlApp.requirement.home.title">Requirements</Translate>
@@ -211,24 +236,15 @@ export const ProjectDetail = () => {
               <FontAwesomeIcon icon={faSync} spin={loadingRequirements} />{' '}
               <Translate contentKey="spec2UmlApp.requirement.home.refreshListLabel">Refresh List</Translate>
             </Button>
-            {isOwner() && (
-              <Button variant="primary" onClick={handleOpenModal} id="jh-create-entity">
-                <FontAwesomeIcon icon={faPlus} />
-                &nbsp;
-                <Translate contentKey="spec2UmlApp.requirement.home.createLabel">Create new Requirement</Translate>
-              </Button>
-            )}
           </div>
         </div>
+
+        {/* Requirements Table showing only sentId, text, status, and Annotate button */}
         <div className="table-responsive">
           {requirementList && requirementList.length > 0 ? (
             <Table responsive striped>
               <thead>
                 <tr>
-                  <th className="hand" onClick={sort('id')}>
-                    <Translate contentKey="spec2UmlApp.requirement.id">ID</Translate>{' '}
-                    <FontAwesomeIcon icon={getSortIconByFieldName('id')} />
-                  </th>
                   <th className="hand" onClick={sort('sentId')}>
                     <Translate contentKey="spec2UmlApp.requirement.sentId">Sent Id</Translate>{' '}
                     <FontAwesomeIcon icon={getSortIconByFieldName('sentId')} />
@@ -237,45 +253,22 @@ export const ProjectDetail = () => {
                     <Translate contentKey="spec2UmlApp.requirement.text">Text</Translate>{' '}
                     <FontAwesomeIcon icon={getSortIconByFieldName('text')} />
                   </th>
-                  <th className="hand" onClick={sort('source')}>
-                    <Translate contentKey="spec2UmlApp.requirement.source">Source</Translate>{' '}
-                    <FontAwesomeIcon icon={getSortIconByFieldName('source')} />
+                  <th className="hand" onClick={sort('status')}>
+                    <Translate contentKey="spec2UmlApp.requirement.status">Status</Translate>{' '}
+                    <FontAwesomeIcon icon={getSortIconByFieldName('status')} />
                   </th>
-                  <th className="hand" onClick={sort('projectId')}>
-                    <Translate contentKey="spec2UmlApp.requirement.projectId">Project Id</Translate>{' '}
-                    <FontAwesomeIcon icon={getSortIconByFieldName('projectId')} />
-                  </th>
-                  <th className="hand" onClick={sort('type')}>
-                    <Translate contentKey="spec2UmlApp.requirement.type">Type</Translate>{' '}
-                    <FontAwesomeIcon icon={getSortIconByFieldName('type')} />
-                  </th>
-                  <th className="hand" onClick={sort('specLevel')}>
-                    <Translate contentKey="spec2UmlApp.requirement.specLevel">Spec Level</Translate>{' '}
-                    <FontAwesomeIcon icon={getSortIconByFieldName('specLevel')} />
-                  </th>
-                  <th />
+                  <th className="text-end">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {requirementList.map(requirement => (
                   <tr key={`entity-${requirement.id}`}>
-                    <td>
-                      <Button as={Link as any} to={`/requirement/${requirement.id}`} variant="link" size="sm">
-                        {requirement.id}
-                      </Button>
-                    </td>
                     <td>{requirement.sentId}</td>
                     <td>{requirement.text}</td>
-                    <td>{requirement.source}</td>
-                    <td>{requirement.projectId}</td>
-                    <td>{requirement.type}</td>
-                    <td>{requirement.specLevel}</td>
+                    <td>{requirement.status || 'N/A'}</td>
                     <td className="text-end">
-                      <Button as={Link as any} to={`/requirement/${requirement.id}`} variant="info" size="sm">
-                        <FontAwesomeIcon icon="eye" />{' '}
-                        <span className="d-none d-md-inline">
-                          <Translate contentKey="entity.action.view">View</Translate>
-                        </span>
+                      <Button variant="warning" size="sm" onClick={() => handleOpenAnnotateModal(requirement)}>
+                        <FontAwesomeIcon icon={faEdit} /> <span className="d-none d-md-inline">Annotate</span>
                       </Button>
                     </td>
                   </tr>
@@ -290,6 +283,7 @@ export const ProjectDetail = () => {
             )
           )}
         </div>
+
         {totalItems > 0 && (
           <div>
             <div className="justify-content-center d-flex">
@@ -306,91 +300,57 @@ export const ProjectDetail = () => {
             </div>
           </div>
         )}
-        {/* Modal for Creating New Requirement */}
-        <Modal show={showModal} onHide={handleCloseModal} size="lg">
-          <ValidatedForm onSubmit={saveRequirement}>
-            <ModalHeader closeButton>
-              <Translate contentKey="spec2UmlApp.requirement.home.createOrEditLabel">Create or edit a Requirement</Translate>
-            </ModalHeader>
-            <ModalBody>
-              <ValidatedField
-                label={translate('spec2UmlApp.requirement.sentId')}
-                id="requirement-sentId"
-                name="sentId"
-                type="text"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                  validate: v => isNumber(v) || translate('entity.validation.number'),
-                }}
-              />
-              <ValidatedField
-                label={translate('spec2UmlApp.requirement.text')}
-                id="requirement-text"
-                name="text"
-                type="textarea"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                }}
-              />
-              <ValidatedField
-                label={translate('spec2UmlApp.requirement.source')}
-                id="requirement-source"
-                name="source"
-                type="text"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                }}
-              />
-              <ValidatedField
-                label={translate('spec2UmlApp.requirement.projectId')}
-                id="requirement-projectId"
-                name="projectId"
-                type="text"
-                defaultValue={projectEntity?.id || ''}
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                }}
-              />
-              <ValidatedField
-                label={translate('spec2UmlApp.requirement.type')}
-                id="requirement-type"
-                name="type"
-                type="text"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                }}
-              />
-              <ValidatedField
-                label={translate('spec2UmlApp.requirement.specLevel')}
-                id="requirement-specLevel"
-                name="specLevel"
-                type="text"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                }}
-              />
-              <ValidatedField
-                label={translate('spec2UmlApp.requirement.classDiagram')}
-                id="requirement-classDiagram"
-                name="classDiagram"
-                type="textarea"
-              />
-              <ValidatedField
-                label={translate('spec2UmlApp.requirement.useCaseDiagram')}
-                id="requirement-useCaseDiagram"
-                name="useCaseDiagram"
-                type="textarea"
-              />
-            </ModalBody>
-            <ModalFooter>
-              <Button variant="secondary" onClick={handleCloseModal}>
-                <Translate contentKey="entity.action.cancel">Cancel</Translate>
-              </Button>
-              <Button variant="primary" type="submit" disabled={updatingRequirement}>
-                <Translate contentKey="entity.action.save">Save</Translate>
-              </Button>
-            </ModalFooter>
-          </ValidatedForm>
+
+        {/* Centered Modal Popup for Requirement Annotation View/Edit */}
+        <Modal show={showAnnotateModal} onHide={handleCloseAnnotateModal} size="lg" centered>
+          <ModalHeader closeButton className="bg-primary text-white">
+            Requirement Annotation - Sent ID #{selectedRequirement?.sentId}
+          </ModalHeader>
+          <ModalBody>
+            {selectedRequirement && (
+              <div>
+                <div className="mb-3">
+                  <label className="fw-bold form-label">Requirement Text:</label>
+                  <textarea className="form-control bg-light" rows={3} value={selectedRequirement.text || ''} readOnly />
+                </div>
+
+                <div className="mb-3">
+                  <label className="fw-bold form-label" htmlFor="classDiagram">
+                    Class Diagram (PlantUML):
+                  </label>
+                  <textarea
+                    id="classDiagram"
+                    name="classDiagram"
+                    className="form-control font-monospace"
+                    rows={5}
+                    value={annotateFormState.classDiagram}
+                    onChange={handleDiagramChange}
+                    placeholder="Enter PlantUML class diagram code..."
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label className="fw-bold form-label" htmlFor="useCaseDiagram">
+                    Use Case Diagram (PlantUML):
+                  </label>
+                  <textarea
+                    id="useCaseDiagram"
+                    name="useCaseDiagram"
+                    className="form-control font-monospace"
+                    rows={5}
+                    value={annotateFormState.useCaseDiagram}
+                    onChange={handleDiagramChange}
+                    placeholder="Enter PlantUML use case diagram code..."
+                  />
+                </div>
+              </div>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="secondary" onClick={handleCloseAnnotateModal}>
+              Cancel
+            </Button>
+          </ModalFooter>
         </Modal>
       </Col>
     </Row>
