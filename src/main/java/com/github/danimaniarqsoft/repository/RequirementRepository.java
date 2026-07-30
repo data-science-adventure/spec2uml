@@ -16,6 +16,18 @@ import reactor.core.publisher.Mono;
 public interface RequirementRepository extends ReactiveMongoRepository<Requirement, String> {
     Flux<Requirement> findAllBy(Pageable pageable);
 
+    /**
+     * Finds requirements by nested project ID (requirement.project.id).
+     */
+    @Query("{ 'project.id': ?0 }")
+    Flux<Requirement> findByProjectId(String projectId, Pageable pageable);
+
+    /**
+     * Counts requirements by nested project ID (requirement.project.id).
+     */
+    @Query(value = "{ 'project.id': ?0 }", count = true)
+    Mono<Long> countByProjectId(String projectId);
+
     @Query("{}")
     Flux<Requirement> findAllWithEagerRelationships(Pageable pageable);
 

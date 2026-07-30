@@ -78,6 +78,15 @@ export const deleteEntity = createAsyncThunk(
   { serializeError: serializeAxiosError },
 );
 
+export const getEntitiesByProject = createAsyncThunk(
+  'requirement/fetch_entity_list_by_project',
+  async ({ projectId, page, size, sort }: { projectId: string; page: number; size: number; sort: string }) => {
+    const requestUrl = `${apiUrl}/project/${projectId}?page=${page}&size=${size}&sort=${sort}&cacheBuster=${Date.now()}`;
+    return axios.get<IRequirement[]>(requestUrl);
+  },
+  { serializeError: serializeAxiosError },
+);
+
 // slice
 
 export const RequirementSlice = createEntitySlice({
@@ -94,7 +103,7 @@ export const RequirementSlice = createEntitySlice({
         state.updateSuccess = true;
         state.entity = {};
       })
-      .addMatcher(isFulfilled(getEntities), (state, action) => {
+      .addMatcher(isFulfilled(getEntities, getEntitiesByProject), (state, action) => {
         const { data, headers } = action.payload;
 
         return {

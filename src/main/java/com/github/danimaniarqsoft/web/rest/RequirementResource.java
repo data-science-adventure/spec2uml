@@ -195,4 +195,34 @@ public class RequirementResource {
         Mono<RequirementDTO> requirementDTO = requirementService.findOne(id);
         return ResponseUtil.wrapOrNotFound(requirementDTO);
     }
+
+    /**
+     * {@code GET  /requirements/project/:projectId} : get all the requirements for a specific project.
+     *
+     * @param projectId the id of the project.
+     * @param pageable the pagination information.
+     * @param request a {@link ServerHttpRequest} request.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of requirements in body.
+     */
+    @GetMapping("/project/{projectId}")
+    public Mono<ResponseEntity<List<RequirementDTO>>> getRequirementsByProject(
+        @PathVariable String projectId,
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
+        ServerHttpRequest request
+    ) {
+        LOG.debug("REST request to get Requirements for Project : {}", projectId);
+        return requirementService
+            .countByProject(projectId)
+            .zipWith(requirementService.findByProject(projectId, pageable).collectList())
+            .map(countWithEntities ->
+                ResponseEntity.ok()
+                    .headers(
+                        PaginationUtil.generatePaginationHttpHeaders(
+                            ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
+                            new PageImpl<>(countWithEntities.getT2(), pageable, countWithEntities.getT1())
+                        )
+                    )
+                    .body(countWithEntities.getT2())
+            );
+    }
 }

@@ -171,6 +171,28 @@ public class RequirementService {
     }
 
     /**
+     * Get all requirements by project id (filters by requirement.project.id).
+     *
+     * @param projectId the project id to filter by.
+     * @param pageable the pagination information.
+     * @return the list of entities.
+     */
+    public Flux<RequirementDTO> findByProject(String projectId, Pageable pageable) {
+        LOG.debug("Request to get Requirements by project id : {}", projectId);
+        return requirementRepository.findByProjectId(projectId, pageable).map(requirementMapper::toDto);
+    }
+
+    /**
+     * Returns the number of requirements available for a specific project.
+     *
+     * @param projectId the project id.
+     * @return the count of entities.
+     */
+    public Mono<Long> countByProject(String projectId) {
+        return requirementRepository.countByProjectId(projectId);
+    }
+
+    /**
      * Delete the requirement by id.
      *
      * @param id the id of the entity.
