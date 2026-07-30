@@ -3,8 +3,16 @@ package com.github.danimaniarqsoft.domain;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UseCaseConcept implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -22,89 +30,47 @@ public class UseCaseConcept implements Serializable {
     private String systemBoundary;
 
     @Field("primary_actors")
+    @Builder.Default
     private List<String> primaryActors = new ArrayList<>();
 
     @Field("secondary_actors")
+    @Builder.Default
     private List<String> secondaryActors = new ArrayList<>();
 
     @Field("preconditions")
+    @Builder.Default
     private List<String> preconditions = new ArrayList<>();
 
     @Field("postconditions")
+    @Builder.Default
     private List<String> postconditions = new ArrayList<>();
 
     @Field("business_rules")
+    @Builder.Default
     private List<String> businessRules = new ArrayList<>();
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getTrigger() {
-        return trigger;
-    }
-
-    public void setTrigger(String trigger) {
-        this.trigger = trigger;
-    }
-
-    public String getSystemBoundary() {
-        return systemBoundary;
-    }
-
-    public void setSystemBoundary(String systemBoundary) {
-        this.systemBoundary = systemBoundary;
-    }
-
     public List<String> getPrimaryActors() {
-        return primaryActors;
-    }
-
-    public void setPrimaryActors(List<String> primaryActors) {
-        this.primaryActors = primaryActors;
+        if (this.primaryActors == null) this.primaryActors = new ArrayList<>();
+        return this.primaryActors;
     }
 
     public List<String> getSecondaryActors() {
-        return secondaryActors;
-    }
-
-    public void setSecondaryActors(List<String> secondaryActors) {
-        this.secondaryActors = secondaryActors;
+        if (this.secondaryActors == null) this.secondaryActors = new ArrayList<>();
+        return this.secondaryActors;
     }
 
     public List<String> getPreconditions() {
-        return preconditions;
-    }
-
-    public void setPreconditions(List<String> preconditions) {
-        this.preconditions = preconditions;
+        if (this.preconditions == null) this.preconditions = new ArrayList<>();
+        return this.preconditions;
     }
 
     public List<String> getPostconditions() {
-        return postconditions;
-    }
-
-    public void setPostconditions(List<String> postconditions) {
-        this.postconditions = postconditions;
+        if (this.postconditions == null) this.postconditions = new ArrayList<>();
+        return this.postconditions;
     }
 
     public List<String> getBusinessRules() {
-        return businessRules;
-    }
-
-    public void setBusinessRules(List<String> businessRules) {
-        this.businessRules = businessRules;
+        if (this.businessRules == null) this.businessRules = new ArrayList<>();
+        return this.businessRules;
     }
 }

@@ -3,8 +3,16 @@ package com.github.danimaniarqsoft.domain;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ClassConcept implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -16,40 +24,24 @@ public class ClassConcept implements Serializable {
     private String stereotype;
 
     @Field("attributes")
+    @Builder.Default
     private List<ClassAttribute> attributes = new ArrayList<>();
 
     @Field("operations")
+    @Builder.Default
     private List<ClassOperation> operations = new ArrayList<>();
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getStereotype() {
-        return stereotype;
-    }
-
-    public void setStereotype(String stereotype) {
-        this.stereotype = stereotype;
-    }
-
     public List<ClassAttribute> getAttributes() {
-        return attributes;
-    }
-
-    public void setAttributes(List<ClassAttribute> attributes) {
-        this.attributes = attributes;
+        if (this.attributes == null) {
+            this.attributes = new ArrayList<>();
+        }
+        return this.attributes;
     }
 
     public List<ClassOperation> getOperations() {
-        return operations;
-    }
-
-    public void setOperations(List<ClassOperation> operations) {
-        this.operations = operations;
+        if (this.operations == null) {
+            this.operations = new ArrayList<>();
+        }
+        return this.operations;
     }
 }

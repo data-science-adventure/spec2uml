@@ -1,19 +1,35 @@
 package com.github.danimaniarqsoft.service.dto;
 
 import com.github.danimaniarqsoft.domain.enumeration.Language;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * A DTO for the {@link com.github.danimaniarqsoft.domain.Project} entity.
  */
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class ProjectDTO implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
+    @EqualsAndHashCode.Include
     private String id;
 
     @NotNull
@@ -33,125 +49,25 @@ public class ProjectDTO implements Serializable {
 
     private UserDTO createdBy;
 
+    @Builder.Default
     private Set<UserDTO> annotatorses = new HashSet<>();
 
+    @Builder.Default
     private Set<UserDTO> reviewerses = new HashSet<>();
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Language getLanguage() {
-        return language;
-    }
-
-    public void setLanguage(Language language) {
-        this.language = language;
-    }
-
-    public String getUmlVersion() {
-        return umlVersion;
-    }
-
-    public void setUmlVersion(String umlVersion) {
-        this.umlVersion = umlVersion;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public UserDTO getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(UserDTO createdBy) {
-        this.createdBy = createdBy;
-    }
-
+    // Defensive getter for annotatorses to prevent NullPointerExceptions
     public Set<UserDTO> getAnnotatorses() {
-        return annotatorses;
+        if (this.annotatorses == null) {
+            this.annotatorses = new HashSet<>();
+        }
+        return this.annotatorses;
     }
 
-    public void setAnnotatorses(Set<UserDTO> annotatorses) {
-        this.annotatorses = annotatorses;
-    }
-
+    // Defensive getter for reviewerses to prevent NullPointerExceptions
     public Set<UserDTO> getReviewerses() {
-        return reviewerses;
-    }
-
-    public void setReviewerses(Set<UserDTO> reviewerses) {
-        this.reviewerses = reviewerses;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
+        if (this.reviewerses == null) {
+            this.reviewerses = new HashSet<>();
         }
-        if (!(o instanceof ProjectDTO)) {
-            return false;
-        }
-
-        ProjectDTO projectDTO = (ProjectDTO) o;
-        if (this.id == null) {
-            return false;
-        }
-        return Objects.equals(this.id, projectDTO.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.id);
-    }
-
-    // prettier-ignore
-    @Override
-    public String toString() {
-        return "ProjectDTO{" +
-            "id='" + getId() + "'" +
-            ", name='" + getName() + "'" +
-            ", description='" + getDescription() + "'" +
-            ", language='" + getLanguage() + "'" +
-            ", umlVersion='" + getUmlVersion() + "'" +
-            ", createdAt='" + getCreatedAt() + "'" +
-            ", updatedAt='" + getUpdatedAt() + "'" +
-            ", createdBy=" + getCreatedBy() +
-            ", annotatorses=" + getAnnotatorses() +
-            ", reviewerses=" + getReviewerses() +
-            "}";
+        return this.reviewerses;
     }
 }

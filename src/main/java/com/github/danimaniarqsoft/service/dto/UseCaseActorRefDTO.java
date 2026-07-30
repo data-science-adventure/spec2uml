@@ -1,16 +1,28 @@
 package com.github.danimaniarqsoft.service.dto;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.Objects;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * A DTO for the {@link com.github.danimaniarqsoft.domain.UseCaseActorRef} entity.
  */
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class UseCaseActorRefDTO implements Serializable {
 
-    private String id;
+    private static final long serialVersionUID = 1L;
 
     @NotNull
     private String actorName;
@@ -18,68 +30,4 @@ public class UseCaseActorRefDTO implements Serializable {
     private UseCaseConceptDTO primaryUseCaseConcept;
 
     private UseCaseConceptDTO secondaryUseCaseConcept;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getActorName() {
-        return actorName;
-    }
-
-    public void setActorName(String actorName) {
-        this.actorName = actorName;
-    }
-
-    public UseCaseConceptDTO getPrimaryUseCaseConcept() {
-        return primaryUseCaseConcept;
-    }
-
-    public void setPrimaryUseCaseConcept(UseCaseConceptDTO primaryUseCaseConcept) {
-        this.primaryUseCaseConcept = primaryUseCaseConcept;
-    }
-
-    public UseCaseConceptDTO getSecondaryUseCaseConcept() {
-        return secondaryUseCaseConcept;
-    }
-
-    public void setSecondaryUseCaseConcept(UseCaseConceptDTO secondaryUseCaseConcept) {
-        this.secondaryUseCaseConcept = secondaryUseCaseConcept;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof UseCaseActorRefDTO)) {
-            return false;
-        }
-
-        UseCaseActorRefDTO useCaseActorRefDTO = (UseCaseActorRefDTO) o;
-        if (this.id == null) {
-            return false;
-        }
-        return Objects.equals(this.id, useCaseActorRefDTO.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.id);
-    }
-
-    // prettier-ignore
-    @Override
-    public String toString() {
-        return "UseCaseActorRefDTO{" +
-            "id='" + getId() + "'" +
-            ", actorName='" + getActorName() + "'" +
-            ", primaryUseCaseConcept=" + getPrimaryUseCaseConcept() +
-            ", secondaryUseCaseConcept=" + getSecondaryUseCaseConcept() +
-            "}";
-    }
 }

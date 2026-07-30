@@ -11,14 +11,10 @@ class UseCaseActorRefDTOTest {
     void dtoEqualsVerifier() throws Exception {
         TestUtil.equalsVerifier(UseCaseActorRefDTO.class);
         UseCaseActorRefDTO useCaseActorRefDTO1 = new UseCaseActorRefDTO();
-        useCaseActorRefDTO1.setId("id1");
         UseCaseActorRefDTO useCaseActorRefDTO2 = new UseCaseActorRefDTO();
         assertThat(useCaseActorRefDTO1).isNotEqualTo(useCaseActorRefDTO2);
-        useCaseActorRefDTO2.setId(useCaseActorRefDTO1.getId());
         assertThat(useCaseActorRefDTO1).isEqualTo(useCaseActorRefDTO2);
-        useCaseActorRefDTO2.setId("id2");
         assertThat(useCaseActorRefDTO1).isNotEqualTo(useCaseActorRefDTO2);
-        useCaseActorRefDTO1.setId(null);
         assertThat(useCaseActorRefDTO1).isNotEqualTo(useCaseActorRefDTO2);
     }
 }

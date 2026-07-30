@@ -6,6 +6,8 @@ import com.github.danimaniarqsoft.domain.User;
 import com.github.danimaniarqsoft.service.dto.ProjectDTO;
 import com.github.danimaniarqsoft.service.dto.RequirementDTO;
 import com.github.danimaniarqsoft.service.dto.UserDTO;
+import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.mapstruct.*;
@@ -20,10 +22,6 @@ public interface RequirementMapper extends EntityMapper<RequirementDTO, Requirem
     @Mapping(target = "annotatorses", source = "annotatorses", qualifiedByName = "userIdSet")
     RequirementDTO toDto(Requirement s);
 
-    @Override
-    @Mapping(target = "removeAnnotators", ignore = true)
-    Requirement toEntity(RequirementDTO requirementDTO);
-
     @Named("projectName")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
@@ -37,6 +35,9 @@ public interface RequirementMapper extends EntityMapper<RequirementDTO, Requirem
 
     @Named("userIdSet")
     default Set<UserDTO> toDtoUserIdSet(Set<User> user) {
-        return user.stream().map(this::toDtoUserId).collect(Collectors.toSet());
+        if (user == null) {
+            return Collections.emptySet();
+        }
+        return user.stream().filter(Objects::nonNull).map(this::toDtoUserId).collect(Collectors.toSet());
     }
 }
