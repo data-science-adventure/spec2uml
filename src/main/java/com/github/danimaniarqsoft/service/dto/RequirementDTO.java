@@ -52,6 +52,8 @@ public class RequirementDTO implements Serializable {
 
     private Instant updatedAt;
 
+    private UserRefDTO createdBy;
+
     private RequirementUseCaseConceptsDTO useCaseConcepts;
 
     private RequirementClassConceptsDTO classConcepts;
@@ -59,5 +61,5 @@ public class RequirementDTO implements Serializable {
     private ProjectDTO project;
 
     @Builder.Default
-    private Set<UserDTO> annotatorses = new HashSet<>();
+    private Set<UserRefDTO> annotatorses = new HashSet<>();
 }

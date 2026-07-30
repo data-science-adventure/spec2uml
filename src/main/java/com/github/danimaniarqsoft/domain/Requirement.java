@@ -25,7 +25,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection = "requirement")
 @Getter
 @Setter
-@ToString(exclude = { "project", "annotatorses" })
+@ToString(exclude = { "createdBy", "project", "annotatorses" })
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
@@ -85,16 +85,19 @@ public class Requirement implements Serializable {
     @Field("updated_at")
     private Instant updatedAt;
 
+    @Field("createdBy")
+    private UserRef createdBy;
+
     @Field("project")
     @JsonIgnoreProperties(value = { "statistics", "createdBy", "annotatorses", "reviewerses" }, allowSetters = true)
     private Project project;
 
     @Field("annotatorses")
     @Builder.Default
-    private Set<User> annotatorses = new HashSet<>();
+    private Set<UserRef> annotatorses = new HashSet<>();
 
     // Safeguard getter for collection
-    public Set<User> getAnnotatorses() {
+    public Set<UserRef> getAnnotatorses() {
         if (this.annotatorses == null) {
             this.annotatorses = new HashSet<>();
         }
@@ -102,13 +105,13 @@ public class Requirement implements Serializable {
     }
 
     // Helper fluent methods for JHipster/domain relationships
-    public Requirement addAnnotators(User user) {
-        getAnnotatorses().add(user);
+    public Requirement addAnnotators(UserRef userRef) {
+        getAnnotatorses().add(userRef);
         return this;
     }
 
-    public Requirement removeAnnotators(User user) {
-        getAnnotatorses().remove(user);
+    public Requirement removeAnnotators(UserRef userRef) {
+        getAnnotatorses().remove(userRef);
         return this;
     }
 }

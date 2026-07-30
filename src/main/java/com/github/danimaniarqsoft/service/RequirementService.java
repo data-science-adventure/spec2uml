@@ -1,8 +1,14 @@
 package com.github.danimaniarqsoft.service;
 
+import com.github.danimaniarqsoft.domain.Requirement;
+import com.github.danimaniarqsoft.domain.UserRef;
 import com.github.danimaniarqsoft.repository.RequirementRepository;
+import com.github.danimaniarqsoft.repository.UserRepository;
+import com.github.danimaniarqsoft.security.SecurityUtils;
 import com.github.danimaniarqsoft.service.dto.RequirementDTO;
 import com.github.danimaniarqsoft.service.mapper.RequirementMapper;
+import com.github.danimaniarqsoft.service.mapper.UserRefMapper;
+import java.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -20,37 +26,84 @@ public class RequirementService {
 
     private final RequirementRepository requirementRepository;
 
+    private final UserRepository userRepository;
+
     private final RequirementMapper requirementMapper;
 
-    public RequirementService(RequirementRepository requirementRepository, RequirementMapper requirementMapper) {
+    private final UserRefMapper userRefMapper;
+
+    public RequirementService(
+        RequirementRepository requirementRepository,
+        UserRepository userRepository,
+        RequirementMapper requirementMapper,
+        UserRefMapper userRefMapper
+    ) {
         this.requirementRepository = requirementRepository;
+        this.userRepository = userRepository;
         this.requirementMapper = requirementMapper;
+        this.userRefMapper = userRefMapper;
     }
 
     /**
      * Save a requirement.
+     *
+     * Sets createdAt and updatedAt to current time, and resolves createdBy
+     * as a lightweight UserRef from the Security Context.
      *
      * @param requirementDTO the entity to save.
      * @return the persisted entity.
      */
     public Mono<RequirementDTO> save(RequirementDTO requirementDTO) {
         LOG.debug("Request to save Requirement : {}", requirementDTO);
-        return requirementRepository.save(requirementMapper.toEntity(requirementDTO)).map(requirementMapper::toDto);
+
+        Requirement entity = requirementMapper.toEntity(requirementDTO);
+        Instant now = Instant.now();
+        entity.setCreatedAt(now);
+        entity.setUpdatedAt(now);
+
+        return SecurityUtils.getCurrentUserLogin()
+            .flatMap(userRepository::findOneByLogin)
+            .map(currentUser -> {
+                UserRef userRef = userRefMapper.userToUserRef(currentUser);
+                entity.setCreatedBy(userRef);
+                return entity;
+            })
+            .defaultIfEmpty(entity)
+            .flatMap(requirementRepository::save)
+            .map(requirementMapper::toDto);
     }
 
     /**
      * Update a requirement.
+     *
+     * Preserves existing createdAt and createdBy from the database,
+     * while updating updatedAt to current time.
      *
      * @param requirementDTO the entity to save.
      * @return the persisted entity.
      */
     public Mono<RequirementDTO> update(RequirementDTO requirementDTO) {
         LOG.debug("Request to update Requirement : {}", requirementDTO);
-        return requirementRepository.save(requirementMapper.toEntity(requirementDTO)).map(requirementMapper::toDto);
+
+        return requirementRepository.findById(requirementDTO.getId()).flatMap(existingRequirement -> {
+            Requirement entityToSave = requirementMapper.toEntity(requirementDTO);
+
+            // Preserve original system attributes
+            entityToSave.setCreatedAt(existingRequirement.getCreatedAt());
+            entityToSave.setCreatedBy(existingRequirement.getCreatedBy());
+
+            // System updates modification timestamp
+            entityToSave.setUpdatedAt(Instant.now());
+
+            return requirementRepository.save(entityToSave).map(requirementMapper::toDto);
+        });
     }
 
     /**
      * Partially update a requirement.
+     *
+     * Ignores incoming values for createdAt and createdBy, while updating
+     * updatedAt to current time.
      *
      * @param requirementDTO the entity to update partially.
      * @return the persisted entity.
@@ -61,7 +114,15 @@ public class RequirementService {
         return requirementRepository
             .findById(requirementDTO.getId())
             .map(existingRequirement -> {
+                // Ignore client-supplied system attributes before mapping
+                requirementDTO.setCreatedAt(null);
+                requirementDTO.setCreatedBy(null);
+                requirementDTO.setUpdatedAt(null);
+
                 requirementMapper.partialUpdate(existingRequirement, requirementDTO);
+
+                // Set system updated timestamp
+                existingRequirement.setUpdatedAt(Instant.now());
 
                 return existingRequirement;
             })
@@ -91,8 +152,8 @@ public class RequirementService {
 
     /**
      * Returns the number of requirements available.
-     * @return the number of entities in the database.
      *
+     * @return the number of entities in the database.
      */
     public Mono<Long> countAll() {
         return requirementRepository.count();
