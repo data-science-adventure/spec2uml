@@ -25,6 +25,7 @@ import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntitiesByProject } from 'app/entities/requirement/requirement.reducer';
 import { IRequirement } from 'app/shared/model/requirement.model';
 import { ASC, DESC, ITEMS_PER_PAGE } from 'app/shared/util/pagination.constants';
+import { truncateWords } from 'app/shared/util/text-utils';
 
 import { getEntity } from './project.reducer';
 
@@ -472,31 +473,37 @@ export const ProjectDetail = () => {
         <div className="table-responsive">
           {requirementList && requirementList.length > 0 ? (
             <Table responsive striped>
-              <thead>
+              <thead className="table-primary">
                 <tr>
-                  <th className="hand" onClick={sort('sentId')}>
-                    <Translate contentKey="spec2UmlApp.requirement.sentId">Sent Id</Translate>{' '}
-                    <FontAwesomeIcon icon={getSortIconByFieldName('sentId')} />
+                  <th className="hand text-nowrap" onClick={sort('sentId')}>
+                    <div className="d-inline-flex align-items-center gap-1">
+                      <Translate contentKey="spec2UmlApp.requirement.sentId">Sent Id</Translate>
+                      <FontAwesomeIcon icon={getSortIconByFieldName('sentId')} />
+                    </div>
                   </th>
-                  <th className="hand" onClick={sort('text')}>
-                    <Translate contentKey="spec2UmlApp.requirement.text">Text</Translate>{' '}
-                    <FontAwesomeIcon icon={getSortIconByFieldName('text')} />
+                  <th className="hand text-nowrap" onClick={sort('text')}>
+                    <div className="d-inline-flex align-items-center gap-1">
+                      <Translate contentKey="spec2UmlApp.requirement.text">Text</Translate>
+                      <FontAwesomeIcon icon={getSortIconByFieldName('text')} />
+                    </div>
                   </th>
-                  <th className="hand" onClick={sort('status')}>
-                    <Translate contentKey="spec2UmlApp.requirement.status">Status</Translate>{' '}
-                    <FontAwesomeIcon icon={getSortIconByFieldName('status')} />
+                  <th className="hand text-nowrap" onClick={sort('status')}>
+                    <div className="d-inline-flex align-items-center gap-1">
+                      <Translate contentKey="spec2UmlApp.requirement.status">Status</Translate>
+                      <FontAwesomeIcon icon={getSortIconByFieldName('status')} />
+                    </div>
                   </th>
-                  <th className="text-end">Actions</th>
+                  <th className="text-end text-nowrap">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {requirementList.map(requirement => (
                   <tr key={`entity-${requirement.id}`}>
                     <td>{requirement.sentId}</td>
-                    <td>{requirement.text}</td>
+                    <td title={requirement.text || ''}>{truncateWords(requirement.text, 20)}</td>
                     <td>{requirement.status || 'N/A'}</td>
                     <td className="text-end">
-                      <Button variant="warning" size="sm" onClick={() => handleOpenAnnotateModal(requirement)}>
+                      <Button variant="outline-warning" size="sm" onClick={() => handleOpenAnnotateModal(requirement)}>
                         <FontAwesomeIcon icon={faEdit} /> <span className="d-none d-md-inline">Annotate</span>
                       </Button>
                     </td>
@@ -652,7 +659,7 @@ export const ProjectDetail = () => {
                 Next <FontAwesomeIcon icon={faArrowRight} />
               </Button>
             </div>
-            <Button variant="secondary" onClick={handleCloseAnnotateModal}>
+            <Button variant="outline-danger" onClick={handleCloseAnnotateModal}>
               Close
             </Button>
           </ModalFooter>
